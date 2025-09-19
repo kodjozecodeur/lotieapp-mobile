@@ -25,9 +25,9 @@ class HomeScreen extends StatelessWidget {
   /// Builds the app bar with modern iOS-style design
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text(
-        AppStrings.home,
-        style: TextStyle(
+      title: Text(
+        'Home',
+        style: const TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,

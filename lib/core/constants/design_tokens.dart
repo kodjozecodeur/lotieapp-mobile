@@ -14,17 +14,18 @@ class DesignTokens {
   // COLORS - Export these exact values from your Figma design
   // ============================================================================
   
-  /// Primary brand colors
-  static const Color primary50 = Color(0xFFE3F2FD);
-  static const Color primary100 = Color(0xFFBBDEFB);
-  static const Color primary200 = Color(0xFF90CAF9);
-  static const Color primary300 = Color(0xFF64B5F6);
-  static const Color primary400 = Color(0xFF42A5F5);
-  static const Color primary500 = Color(0xFF2196F3);
-  static const Color primary600 = Color(0xFF1E88E5);
-  static const Color primary700 = Color(0xFF1976D2);
-  static const Color primary800 = Color(0xFF1565C0);
-  static const Color primary900 = Color(0xFF0D47A1);
+  /// Primary brand colors - Dark Green (#144A19)
+  static const Color primary50 = Color(0xFFE8F5E8);
+  static const Color primary100 = Color(0xFFC8E6C9);
+  static const Color primary200 = Color(0xFFA5D6A7);
+  static const Color primary300 = Color(0xFF81C784);
+  static const Color primary400 = Color(0xFF66BB6A);
+  static const Color primary500 = Color(0xFF4CAF50);
+  static const Color primary600 = Color(0xFF43A047);
+  static const Color primary700 = Color(0xFF388E3C);
+  static const Color primary800 = Color(0xFF2E7D32);
+  static const Color primary900 = Color(0xFF1B5E20);
+  static const Color primary950 = Color(0xFF144A19);
 
   /// Secondary brand colors
   static const Color secondary50 = Color(0xFFF3E5F5);

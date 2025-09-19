@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/onboarding_provider.dart';
 import 'services/api_service.dart';
-import 'routes/app_routes.dart';
+import 'routes/app_router.dart';
 import 'core/constants/design_tokens.dart';
 
 /// Main application widget that configures the app structure
@@ -30,13 +31,22 @@ class App extends StatelessWidget {
         return MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => AuthProvider()),
+            ChangeNotifierProvider(create: (_) => OnboardingProvider.instance),
           ],
-          child: MaterialApp(
-            title: 'Lotie App',
-            debugShowCheckedModeBanner: false,
-            theme: _buildTheme(),
-            onGenerateRoute: AppRoutes.generateRoute,
-            initialRoute: AppRoutes.home,
+          child: Builder(
+            builder: (context) {
+              // Initialize providers after they're available
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Provider.of<OnboardingProvider>(context, listen: false).initialize();
+              });
+              
+              return MaterialApp.router(
+                title: 'Lotie App',
+                debugShowCheckedModeBanner: false,
+                theme: _buildTheme(),
+                routerConfig: AppRouter.router,
+              );
+            },
           ),
         );
       },
@@ -51,9 +61,9 @@ class App extends StatelessWidget {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: DesignTokens.primary500,
+        seedColor: DesignTokens.primary950,
         brightness: Brightness.light,
-        primary: DesignTokens.primary500,
+        primary: DesignTokens.primary950,
         secondary: DesignTokens.secondary500,
         surface: Colors.white,
         error: DesignTokens.error500,

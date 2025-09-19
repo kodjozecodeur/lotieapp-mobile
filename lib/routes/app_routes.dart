@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
+import '../screens/loading/loading_screen.dart';
 
 /// Application routes configuration
 /// 
@@ -13,6 +14,7 @@ class AppRoutes {
 
   // Route names
   static const String home = '/';
+  static const String loading = '/loading';
   static const String login = '/login';
   static const String register = '/register';
   static const String profile = '/profile';
@@ -28,6 +30,12 @@ class AppRoutes {
       case home:
         return _buildRoute(
           const HomeScreen(),
+          settings,
+        );
+      
+      case loading:
+        return _buildRoute(
+          const LoadingScreen(),
           settings,
         );
       
