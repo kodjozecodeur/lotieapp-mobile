@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/constants/design_tokens.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/onboarding_provider.dart';
 import '../../routes/app_router.dart';
+import '../../core/utils/logger.dart';
+import '../../providers/auth_notifier.dart';
 
 /// Loading screen widget with animated dots
 /// 
@@ -13,14 +13,14 @@ import '../../routes/app_router.dart';
 /// and determines the next navigation step.
 /// Follows Apple's Human Interface Guidelines for loading states.
 
-class LoadingScreen extends StatefulWidget {
+class LoadingScreen extends ConsumerStatefulWidget {
   const LoadingScreen({super.key});
 
   @override
-  State<LoadingScreen> createState() => _LoadingScreenState();
+  ConsumerState<LoadingScreen> createState() => _LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen>
+class _LoadingScreenState extends ConsumerState<LoadingScreen>
     with TickerProviderStateMixin {
   late List<AnimationController> _dotControllers;
   late List<Animation<double>> _dotAnimations;
@@ -84,21 +84,30 @@ class _LoadingScreenState extends State<LoadingScreen>
   /// 2. If user completed onboarding → Login/Registration
   /// 3. If first time user → Onboarding
   void _determineNextRoute() {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final onboardingProvider = Provider.of<OnboardingProvider>(context, listen: false);
+    logger.debug('[LoadingScreen] Determining next route - API not connected, going to onboarding');
     
-    // Check if user is already authenticated
-    if (authProvider.isAuthenticated) {
+    // TODO: Remove this when API is connected
+    // For now, always go to onboarding since API is not ready
+    AppRouter.goToOnboarding(context);
+    
+    /* Original auth check logic - restore when API is ready:
+    final authState = ref.read(authNotifierProvider);
+    
+    // Check authentication status
+    if (authState.isAuthenticated) {
+      logger.info('[LoadingScreen] User authenticated, going to home');
       AppRouter.goToHome(context);
-      return;
-    }
-
-    // Check if user completed onboarding
-    if (onboardingProvider.isOnboardingCompleted) {
-      AppRouter.goToLogin(context);
-    } else {
+    } else if (authState.status == AuthStatus.unauthenticated) {
+      logger.info('[LoadingScreen] User not authenticated, going to onboarding');
       AppRouter.goToOnboarding(context);
+    } else {
+      // Still checking authentication, wait a bit more
+      logger.debug('[LoadingScreen] Still checking authentication, waiting...');
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _determineNextRoute();
+      });
     }
+    */
   }
 
   @override

@@ -25,8 +25,8 @@ class AppRouter {
   /// - Route transitions
   /// - Error handling
   static final GoRouter router = GoRouter(
-    // Initial route - will be determined by authentication state
-    initialLocation: '/onboarding',
+    // Initial route - start with splash screen
+    initialLocation: '/splash',
     
     // Route builder function
     routes: [

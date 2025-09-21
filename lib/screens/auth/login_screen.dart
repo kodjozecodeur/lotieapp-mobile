@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import '../../core/constants/design_tokens.dart';
-import '../../providers/auth_provider.dart';
+import '../../core/utils/logger.dart';
 import '../../routes/app_router.dart';
+import '../../providers/auth_notifier.dart';
 
 /// Login screen
 /// 
@@ -14,14 +15,14 @@ import '../../routes/app_router.dart';
 /// - Smooth animations
 /// - Apple-style UI components
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
+class _LoginScreenState extends ConsumerState<LoginScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -87,13 +88,30 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     try {
-      // TODO: Implement actual login logic
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      logger.info('[LoginScreen] Attempting login');
       
-      // Navigate to home screen
-      AppRouter.goToHome(context);
+      final success = await ref.read(authNotifierProvider.notifier).login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+      
+      if (success) {
+        logger.info('[LoginScreen] Login successful, navigating to home');
+        AppRouter.goToHome(context);
+      } else {
+        // Error message will be shown from auth state
+        final authState = ref.read(authNotifierProvider);
+        if (authState.hasError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authState.errorMessage!),
+              backgroundColor: DesignTokens.error500,
+            ),
+          );
+        }
+      }
     } catch (e) {
-      // Handle error
+      logger.error('[LoginScreen] Login error', e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Login failed: ${e.toString()}'),

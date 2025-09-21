@@ -1,52 +1,172 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import '../core/constants/app_constants.dart';
+import '../core/config/api_config.dart';
+import '../core/utils/logger.dart';
+import '../models/api_response.dart';
+import 'token_service.dart';
 
-/// API service for handling HTTP requests
+/// API service for handling HTTP requests with Express.js backend
 /// 
 /// This service handles all API communication following clean architecture
 /// principles. It provides methods for GET, POST, PUT, DELETE operations
-/// with proper error handling and response parsing.
+/// with proper error handling, JWT token management, and Express.js integration.
 
 class ApiService {
-  static final ApiService _instance = ApiService._internal();
-  factory ApiService() => _instance;
-  ApiService._internal();
-
+  final TokenService _tokenService;
   late Dio _dio;
 
-  /// Initializes the API service with base configuration
+  ApiService(this._tokenService);
+
+  /// Initializes the API service with Express.js configuration
   void initialize() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: AppConstants.baseUrl,
-        connectTimeout: AppConstants.apiTimeout,
-        receiveTimeout: AppConstants.apiTimeout,
-        sendTimeout: AppConstants.apiTimeout,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: ApiConfig.connectTimeout,
+        receiveTimeout: ApiConfig.receiveTimeout,
+        sendTimeout: ApiConfig.sendTimeout,
+        headers: ApiConfig.defaultHeaders,
       ),
     );
 
-    // Add interceptors for logging and error handling
-    _dio.interceptors.add(
-      InterceptorsWrapper(
+    // Add JWT authentication interceptor
+    _dio.interceptors.add(_createAuthInterceptor());
+    
+    // Add logging interceptor
+    _dio.interceptors.add(_createLoggingInterceptor());
+    
+    // Add error handling interceptor
+    _dio.interceptors.add(_createErrorInterceptor());
+    
+    logger.info('[ApiService] Initialized with base URL: ${ApiConfig.baseUrl}');
+  }
+
+  /// Creates JWT authentication interceptor
+  InterceptorsWrapper _createAuthInterceptor() {
+    return InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        // Add JWT token to requests
+        final token = await _tokenService.getAccessToken();
+        if (token != null && token.isNotEmpty) {
+          options.headers[ApiConfig.tokenHeader] = '${ApiConfig.tokenPrefix} $token';
+        }
+        handler.next(options);
+      },
+      onError: (error, handler) async {
+        // Handle 401 Unauthorized - attempt token refresh
+        if (error.response?.statusCode == 401) {
+          final refreshed = await _attemptTokenRefresh();
+          if (refreshed) {
+            // Retry the original request with new token
+            final token = await _tokenService.getAccessToken();
+            if (token != null) {
+              error.requestOptions.headers[ApiConfig.tokenHeader] = '${ApiConfig.tokenPrefix} $token';
+              try {
+                final response = await _dio.fetch(error.requestOptions);
+                return handler.resolve(response);
+              } catch (retryError) {
+                return handler.next(DioException.requestCancelled(
+                  requestOptions: error.requestOptions,
+                  reason: 'Token refresh retry failed',
+                ));
+              }
+            }
+          }
+        }
+        handler.next(error);
+      },
+    );
+  }
+
+  /// Creates logging interceptor
+  InterceptorsWrapper _createLoggingInterceptor() {
+    return InterceptorsWrapper(
         onRequest: (options, handler) {
-          print('[ApiService] Request: ${options.method} ${options.uri}');
+        logger.apiRequest(
+          options.method,
+          options.uri.toString(),
+          data: options.data,
+        );
           handler.next(options);
         },
         onResponse: (response, handler) {
-          print('[ApiService] Response: ${response.statusCode} ${response.requestOptions.uri}');
+        logger.apiResponse(
+          response.requestOptions.method,
+          response.requestOptions.uri.toString(),
+          response.statusCode ?? 0,
+        );
           handler.next(response);
         },
         onError: (error, handler) {
-          print('[ApiService] Error: ${error.message}');
+        logger.apiError(
+          error.requestOptions.method,
+          error.requestOptions.uri.toString(),
+          error,
+        );
           handler.next(error);
         },
-      ),
     );
+  }
+
+  /// Creates error handling interceptor
+  InterceptorsWrapper _createErrorInterceptor() {
+    return InterceptorsWrapper(
+      onError: (error, handler) {
+        final apiException = _handleDioError(error);
+        handler.reject(DioException(
+          requestOptions: error.requestOptions,
+          error: apiException,
+          type: error.type,
+          response: error.response,
+        ));
+      },
+    );
+  }
+
+  /// Attempt to refresh JWT token
+  Future<bool> _attemptTokenRefresh() async {
+    try {
+      final refreshToken = await _tokenService.getRefreshToken();
+      if (refreshToken == null) {
+        logger.warning('[ApiService] No refresh token available');
+        return false;
+      }
+
+      logger.info('[ApiService] Attempting token refresh');
+      
+      final response = await _dio.post(
+        ApiConfig.buildAuthUrl('refresh'),
+        data: {'refreshToken': refreshToken},
+        options: Options(
+          headers: {ApiConfig.tokenHeader: '${ApiConfig.tokenPrefix} $refreshToken'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final apiResponse = ApiResponse.fromJson(
+          response.data,
+          (data) => data as Map<String, dynamic>,
+        );
+
+        if (apiResponse.success && apiResponse.data != null) {
+          final authData = apiResponse.data!;
+          await _tokenService.saveTokens(
+            accessToken: authData['accessToken'] as String,
+            refreshToken: authData['refreshToken'] as String?,
+          );
+          
+          logger.info('[ApiService] Token refresh successful');
+          return true;
+        }
+      }
+      
+      logger.warning('[ApiService] Token refresh failed - invalid response');
+      return false;
+    } catch (e) {
+      logger.error('[ApiService] Token refresh failed', e);
+      await _tokenService.clearTokens(); // Clear invalid tokens
+      return false;
+    }
   }
 
   /// Sets the authorization token for authenticated requests
@@ -79,7 +199,7 @@ class ApiService {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleDioError(e);
     }
   }
 
@@ -104,7 +224,7 @@ class ApiService {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleDioError(e);
     }
   }
 
@@ -129,7 +249,7 @@ class ApiService {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleDioError(e);
     }
   }
 
@@ -151,7 +271,7 @@ class ApiService {
       );
       return _handleResponse(response);
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleDioError(e);
     }
   }
 
@@ -169,42 +289,112 @@ class ApiService {
       }
     } else {
       throw ApiException(
-        'Request failed with status: ${response.statusCode}',
-        response.statusCode ?? 500,
+        message: 'Request failed with status: ${response.statusCode}',
+        statusCode: response.statusCode ?? 500,
       );
     }
   }
 
-  /// Handles API errors and converts them to custom exceptions
+  /// Handles Dio errors and converts them to API exceptions
   /// 
   /// [error] - The Dio exception
-  ApiException _handleError(DioException error) {
+  ApiException _handleDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return ApiException('Connection timeout. Please check your internet connection.', 408);
+        return ApiException(
+          message: 'Connection timeout. Please check your internet connection.',
+          code: 'TIMEOUT',
+          statusCode: 408,
+        );
       case DioExceptionType.badResponse:
-        final statusCode = error.response?.statusCode ?? 500;
-        final message = error.response?.data?['message'] ?? 'Server error occurred';
-        return ApiException(message, statusCode);
+        return _handleBadResponse(error);
       case DioExceptionType.cancel:
-        return ApiException('Request was cancelled', 499);
+        return ApiException(
+          message: 'Request was cancelled',
+          code: 'CANCELLED',
+          statusCode: 499,
+        );
       case DioExceptionType.connectionError:
-        return ApiException('No internet connection. Please check your network.', 0);
+        return ApiException(
+          message: 'No internet connection. Please check your network.',
+          code: 'NETWORK_ERROR',
+          statusCode: 0,
+        );
       default:
-        return ApiException('An unexpected error occurred', 500);
+        return ApiException(
+          message: 'An unexpected error occurred',
+          code: 'UNKNOWN',
+          statusCode: 500,
+        );
     }
+  }
+
+  /// Handle bad response errors with Express.js error format
+  ApiException _handleBadResponse(DioException error) {
+    final statusCode = error.response?.statusCode ?? 500;
+    final responseData = error.response?.data;
+
+    // Try to parse Express.js error response format
+    if (responseData is Map<String, dynamic>) {
+      final errorData = responseData['error'] as Map<String, dynamic>?;
+      if (errorData != null) {
+        return ApiException(
+          message: errorData['message'] as String? ?? 'Server error occurred',
+          code: errorData['code'] as String?,
+          statusCode: statusCode,
+          details: errorData['details'] as Map<String, dynamic>?,
+        );
+      }
+      
+      // Fallback to direct message
+      final message = responseData['message'] as String? ?? 'Server error occurred';
+      return ApiException(
+        message: message,
+        statusCode: statusCode,
+      );
+    }
+
+    // Default error message based on status code
+    String message;
+    String? code;
+    
+    switch (statusCode) {
+      case 400:
+        message = 'Bad request. Please check your input.';
+        code = 'BAD_REQUEST';
+        break;
+      case 401:
+        message = 'Unauthorized. Please login again.';
+        code = 'UNAUTHORIZED';
+        break;
+      case 403:
+        message = 'Access forbidden.';
+        code = 'FORBIDDEN';
+        break;
+      case 404:
+        message = 'Resource not found.';
+        code = 'NOT_FOUND';
+        break;
+      case 422:
+        message = 'Validation failed. Please check your input.';
+        code = 'VALIDATION_ERROR';
+        break;
+      case 500:
+        message = 'Internal server error. Please try again later.';
+        code = 'SERVER_ERROR';
+        break;
+      default:
+        message = 'Server error occurred (Status: $statusCode)';
+        code = 'HTTP_ERROR';
+    }
+
+    return ApiException(
+      message: message,
+      code: code,
+      statusCode: statusCode,
+    );
   }
 }
 
-/// Custom API exception class
-class ApiException implements Exception {
-  final String message;
-  final int statusCode;
-
-  const ApiException(this.message, this.statusCode);
-
-  @override
-  String toString() => 'ApiException: $message (Status: $statusCode)';
-}

@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
   /// to determine the next screen based on app state
   void _determineNextRoute() {
     // Navigate to loading screen which will handle the actual routing logic
-    AppRouter.goToOnboarding(context);
+    AppRouter.goToLoading(context);
   }
 
   @override

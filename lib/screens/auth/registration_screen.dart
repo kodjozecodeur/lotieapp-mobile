@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import '../../core/constants/design_tokens.dart';
-import '../../providers/auth_provider.dart';
+import '../../core/utils/logger.dart';
 import '../../routes/app_router.dart';
 
 /// Registration screen

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/constants/app_colors.dart';
-import '../core/constants/app_strings.dart';
+import '../core/utils/logger.dart';
+import '../providers/auth_notifier.dart';
 
 /// Home screen widget
 /// 
@@ -10,15 +10,17 @@ import '../core/constants/app_strings.dart';
 /// dashboard and main functionality. It follows Apple's Human Interface
 /// Guidelines for a modern, sleek design.
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    logger.debug('[HomeScreen] Building home screen');
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(context),
-      body: _buildBody(context),
+      body: _buildBody(context, ref),
     );
   }
 
@@ -44,7 +46,50 @@ class HomeScreen extends StatelessWidget {
           ),
           onPressed: () {
             // TODO: Navigate to notifications screen
-            print('[HomeScreen] Notifications tapped');
+            logger.debug('[HomeScreen] Notifications tapped');
+          },
+        ),
+        Consumer(
+          builder: (context, ref, child) {
+            final authState = ref.watch(authNotifierProvider);
+            if (authState.isAuthenticated) {
+              return PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.account_circle_outlined,
+                  color: AppColors.textPrimary,
+                ),
+                onSelected: (value) async {
+                  if (value == 'logout') {
+                    logger.info('[HomeScreen] User logout requested');
+                    await ref.read(authNotifierProvider.notifier).logout();
+                    // Navigation will be handled by route guards
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'profile',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_outline, size: 20),
+                        const SizedBox(width: 8),
+                        Text(authState.displayName),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, size: 20, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Logout', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+            return const SizedBox.shrink();
           },
         ),
       ],
@@ -52,30 +97,35 @@ class HomeScreen extends StatelessWidget {
   }
 
   /// Builds the main body content
-  Widget _buildBody(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, child) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildWelcomeSection(context, authProvider),
-              const SizedBox(height: 24),
-              _buildQuickActionsSection(context),
-              const SizedBox(height: 24),
-              _buildStatsSection(context),
-              const SizedBox(height: 24),
-              _buildRecentActivitySection(context),
-            ],
-          ),
-        );
-      },
+  Widget _buildBody(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    
+    // Show loading if authentication is still being checked
+    if (authState.status == AuthStatus.unknown) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildWelcomeSection(context, authState),
+          const SizedBox(height: 24),
+          _buildQuickActionsSection(context, ref),
+          const SizedBox(height: 24),
+          _buildStatsSection(context),
+          const SizedBox(height: 24),
+          _buildRecentActivitySection(context),
+        ],
+      ),
     );
   }
 
   /// Builds the welcome section with user greeting
-  Widget _buildWelcomeSection(BuildContext context, AuthProvider authProvider) {
+  Widget _buildWelcomeSection(BuildContext context, AuthState authState) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -102,7 +152,7 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            authProvider.user?.name ?? 'User',
+            authState.isAuthenticated ? authState.displayName : 'Guest',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -120,7 +170,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   /// Builds the quick actions section
-  Widget _buildQuickActionsSection(BuildContext context) {
+  Widget _buildQuickActionsSection(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -141,7 +191,7 @@ class HomeScreen extends StatelessWidget {
                 title: 'Create New',
                 subtitle: 'Start something new',
                 onTap: () {
-                  print('[HomeScreen] Create New tapped');
+                  logger.debug('[HomeScreen] Create New tapped');
                 },
               ),
             ),
@@ -153,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                 title: 'Search',
                 subtitle: 'Find what you need',
                 onTap: () {
-                  print('[HomeScreen] Search tapped');
+                  logger.debug('[HomeScreen] Search tapped');
                 },
               ),
             ),

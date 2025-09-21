@@ -9,7 +9,8 @@ import '../services/api_service.dart';
 /// logout, registration, and state management.
 
 class AuthProvider extends ChangeNotifier {
-  final ApiService _apiService = ApiService();
+  // TODO: Remove this provider when migration to Riverpod is complete
+  late final ApiService _apiService;
   
   UserModel? _user;
   bool _isLoading = false;

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
-import 'providers/auth_provider.dart';
-import 'providers/onboarding_provider.dart';
-import 'services/api_service.dart';
 import 'routes/app_router.dart';
 import 'core/constants/design_tokens.dart';
+import 'core/utils/logger.dart';
 
 /// Main application widget that configures the app structure
 /// 
 /// This file separates the app configuration from main.dart
 /// following clean architecture principles. It handles:
 /// - Theme configuration
-/// - Provider setup
+/// - Riverpod setup
 /// - Route configuration
 /// - Global app settings
 class App extends StatelessWidget {
@@ -20,36 +18,22 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize services
-    ApiService().initialize();
+    logger.debug('[App] Building app with Riverpod');
     
-    return ScreenUtilInit(
-      designSize: const Size(375, 812), // iPhone 12 Pro size as base
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => AuthProvider()),
-            ChangeNotifierProvider(create: (_) => OnboardingProvider.instance),
-          ],
-          child: Builder(
-            builder: (context) {
-              // Initialize providers after they're available
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Provider.of<OnboardingProvider>(context, listen: false).initialize();
-              });
-              
-              return MaterialApp.router(
-                title: 'Lotie App',
-                debugShowCheckedModeBanner: false,
-                theme: _buildTheme(),
-                routerConfig: AppRouter.router,
-              );
-            },
-          ),
-        );
-      },
+    return ProviderScope(
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812), // iPhone 12 Pro size as base
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return MaterialApp.router(
+            title: 'Lotie App',
+            debugShowCheckedModeBanner: false,
+            theme: _buildTheme(),
+            routerConfig: AppRouter.router,
+          );
+        },
+      ),
     );
   }
 
