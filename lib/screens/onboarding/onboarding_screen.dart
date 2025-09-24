@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/design_tokens.dart';
 import '../../routes/app_router.dart';
 import '../../core/utils/logger.dart';
@@ -9,7 +10,7 @@ import '../../core/utils/logger.dart';
 class OnboardingData {
   final String title;
   final String subtitle;
-  final IconData icon;
+  final Widget icon;
 
   OnboardingData({
     required this.title,
@@ -46,17 +47,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
     OnboardingData(
       title: "Vos marchands préférés à portée de main",
       subtitle: "Découvrez une large sélection des marchands locaux,\nlivrés directement chez vous.",
-      icon: Icons.shopping_cart,
+      icon: SvgPicture.asset(
+        'assets/icons/onboarding_1_icon.svg',
+        width: 32,
+        height: 32,
+        
+      ),
     ),
     OnboardingData(
       title: "Commandez et faites-vous\nlivrer en un clic.",
       subtitle: "Découvrez une large sélection des marchands locaux,\nlivrés directement chez vous.",
-      icon: Icons.local_shipping,
+      icon: SvgPicture.asset(
+        'assets/icons/onboarding_2_icon.svg',
+        width: 32,
+        height: 32,
+        
+      ),
     ),
     OnboardingData(
       title: "Suivez votre commande\nà chaque étape.",
       subtitle: "Restez informé avec un suivi en temps réel, pour savoir\nexactement quand votre colis arrivera.",
-      icon: Icons.location_on,
+      icon: SvgPicture.asset(
+        'assets/icons/onboarding_3_icon.svg',
+        width: 32,
+        height: 32,
+        
+      ),
     ),
   ];
 
@@ -92,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
       curve: Curves.easeInOut,
     ));
     
-    // Start animations
+    // Start animationsalso
     _fadeController.forward();
     _loadingController.repeat();
     
@@ -306,7 +322,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
                   width: 60 * _loadingAnimation.value,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: DesignTokens.primary500, // Use the same green as the button
+                    color: DesignTokens.primary950, // Use the same green as the button
                     borderRadius: BorderRadius.circular(2),
                   ),
                 );
@@ -381,11 +397,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        width: 60,
-        height: 60,
+        width: 50,
+        height: 50,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
+          shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -394,10 +410,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
             ),
           ],
         ),
-        child: Icon(
-          _onboardingData[_currentPage].icon, // Use current page icon
-          color: DesignTokens.primary700,
-          size: 30,
+        child: Center(
+          child: _onboardingData[_currentPage].icon, // Use current page icon widget
         ),
       ),
     );
@@ -429,7 +443,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
         _onboardingData[_currentPage].subtitle,
         style: TextStyle(
           fontFamily: DesignTokens.fontFamilyPrimary,
-          color: Colors.white.withValues(alpha: 0.8),
+          color: Color(0xFFFFFFFF),
           fontSize: DesignTokens.fontSizeBase, // 16px
           fontWeight: DesignTokens.fontWeightRegular,
           height: DesignTokens.lineHeightNormal,
@@ -447,20 +461,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
       child: ElevatedButton(
         onPressed: _handleCreateAccount,
         style: ElevatedButton.styleFrom(
-          backgroundColor: DesignTokens.primary500, // Use the green color from design
+          backgroundColor: DesignTokens.primary950, // Use the green color from design
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: Text(
-          "Créer un compte",
-          style: TextStyle(
-            fontFamily: DesignTokens.fontFamilyPrimary,
-            fontSize: 17,
-            fontWeight: DesignTokens.fontWeightSemiBold,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Créer un compte",
+              style: TextStyle(
+                fontFamily: DesignTokens.fontFamilyPrimary,
+                fontSize: 17,
+                fontWeight: DesignTokens.fontWeightMedium,
+              ),
+            ),
+            SizedBox(width: 8), // Space between text and arrow
+            Icon(
+              Icons.arrow_forward,
+              size: 20,
+              color: Colors.white,
+            ),
+          ],
         ),
       ),
     );
@@ -474,10 +499,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
       child: TextButton(
         onPressed: _handleLogin,
         style: TextButton.styleFrom(
-          backgroundColor: Colors.white.withValues(alpha: 0.15),
-          foregroundColor: Colors.white,
+          backgroundColor: Color(0xFFF4F5F4),
+          foregroundColor: Color(0xFF090B09),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         child: Text(
@@ -485,7 +510,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> with TickerProvider
           style: TextStyle(
             fontFamily: DesignTokens.fontFamilyPrimary,
             fontSize: 17,
-            fontWeight: DesignTokens.fontWeightSemiBold,
+            fontWeight: DesignTokens.fontWeightMedium,
           ),
         ),
       ),

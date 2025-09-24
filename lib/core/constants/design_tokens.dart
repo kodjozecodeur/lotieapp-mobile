@@ -45,11 +45,15 @@ class DesignTokens {
   static const Color neutral200 = Color(0xFFEEEEEE);
   static const Color neutral300 = Color(0xFFE0E0E0);
   static const Color neutral400 = Color(0xFFBDBDBD);
-  static const Color neutral500 = Color(0xFF9E9E9E);
+  static const Color neutral500 = Color(0xFFF4F5F4);
+  static const Color neutral550 = Color(0xFF181727);
   static const Color neutral600 = Color(0xFF757575);
+  static const Color neutral650 = Color(0xFF8C8C8C);
   static const Color neutral700 = Color(0xFF616161);
   static const Color neutral800 = Color(0xFF424242);
-  static const Color neutral900 = Color(0xFF212121);
+  static const Color neutral850 = Color(0xFF111111);
+
+  static const Color neutral900 = Color(0xFF090B09);
 
   /// Semantic colors
   static const Color success50 = Color(0xFFE8F5E8);

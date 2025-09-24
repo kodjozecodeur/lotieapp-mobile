@@ -67,6 +67,9 @@ dependencies:
   flutter_staggered_animations: ^1.1.1  # Staggered animations
   flutter_animate: ^4.5.0         # Advanced animations
   
+  # Phone Number Input
+  intl_phone_field: ^3.2.0        # Country picker and phone formatting
+  
   # Routing
   go_router: ^14.2.0              # Declarative routing for navigation
 
@@ -117,7 +120,7 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: SF Pro
+    - family: SF Pro Display
       fonts:
         - asset: assets/fonts/SFProDisplay-Regular.ttf
         - asset: assets/fonts/SFProDisplay-ThinItalic.ttf
