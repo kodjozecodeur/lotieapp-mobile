@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../core/constants/design_tokens.dart';
 import '../../models/merchant.dart';
 
 /// Merchant card component
-/// 
+///
 /// This widget displays individual merchant information with:
 /// - Rounded image container with favorite heart icon overlay
 /// - Merchant name, distance, delivery time
 /// - Star rating with number
 /// - Restaurant icon prefix
 /// - Proper shadows and spacing
-/// 
+///
 /// All styling uses DesignTokens for consistency.
 class MerchantCard extends StatelessWidget {
   const MerchantCard({
@@ -24,13 +25,13 @@ class MerchantCard extends StatelessWidget {
 
   /// Merchant data to display
   final Merchant merchant;
-  
+
   /// Callback when card is tapped
   final Function(String merchantId)? onTapped;
-  
+
   /// Callback when favorite icon is tapped
   final Function(String merchantId)? onFavoriteTapped;
-  
+
   /// Card width
   final double width;
 
@@ -41,17 +42,17 @@ class MerchantCard extends StatelessWidget {
       child: Container(
         width: width.w,
         margin: EdgeInsets.only(right: DesignTokens.space4.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(DesignTokens.cardBorderRadius.r),
-          boxShadow: DesignTokens.shadowBase,
-        ),
+        // decoration: BoxDecoration(
+        //   color: Colors.white,
+        //   borderRadius: BorderRadius.circular(DesignTokens.cardBorderRadius.r),
+        //   boxShadow: DesignTokens.shadowBase,
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image with favorite overlay
             _buildImageSection(),
-            
+
             // Content section
             Padding(
               padding: EdgeInsets.all(DesignTokens.space3.w),
@@ -60,16 +61,18 @@ class MerchantCard extends StatelessWidget {
                 children: [
                   // Merchant name with restaurant icon
                   _buildMerchantName(),
-                  
+
                   SizedBox(height: DesignTokens.space2.h),
-                  
+
                   // Distance and delivery time
-                  _buildDeliveryInfo(),
-                  
-                  SizedBox(height: DesignTokens.space2.h),
-                  
-                  // Rating
-                  _buildRating(),
+                  Row(
+                    children: [
+                      _buildDeliveryInfo(),
+                      // Rating
+                      SizedBox(width: DesignTokens.space2.w),
+                      _buildRating(),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -84,19 +87,15 @@ class MerchantCard extends StatelessWidget {
     return Container(
       height: 120.h,
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(DesignTokens.cardBorderRadius.r),
-          topRight: Radius.circular(DesignTokens.cardBorderRadius.r),
-        ),
-      ),
+      // decoration: BoxDecoration(
+      //   borderRadius: BorderRadius.circular(DesignTokens.cardBorderRadius.r)
+      // ),
       child: Stack(
         children: [
           // Merchant image
           ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(DesignTokens.cardBorderRadius.r),
-              topRight: Radius.circular(DesignTokens.cardBorderRadius.r),
+            borderRadius: BorderRadius.circular(
+              DesignTokens.cardBorderRadius.r,
             ),
             child: Image.asset(
               merchant.imageUrl,
@@ -118,7 +117,7 @@ class MerchantCard extends StatelessWidget {
               },
             ),
           ),
-          
+
           // Favorite heart icon overlay
           Positioned(
             top: DesignTokens.space2.h,
@@ -127,16 +126,18 @@ class MerchantCard extends StatelessWidget {
               onTap: () => onFavoriteTapped?.call(merchant.id),
               child: Container(
                 padding: EdgeInsets.all(DesignTokens.space2.w),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFFFFF).withOpacity(0.8),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  merchant.isFavorite ? Icons.favorite : Icons.favorite_outline,
-                  size: 16.w,
-                  color: merchant.isFavorite 
-                      ? DesignTokens.error500 
-                      : DesignTokens.neutral650,
+                child: SvgPicture.asset(
+                  'assets/icons/favorite_icon.svg',
+                  width: 20.w,
+                  height: 20.h,
+                  colorFilter: ColorFilter.mode(
+                    DesignTokens.neutral850,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -150,10 +151,14 @@ class MerchantCard extends StatelessWidget {
   Widget _buildMerchantName() {
     return Row(
       children: [
-        Icon(
-          Icons.restaurant,
-          size: 14.w,
-          color: DesignTokens.neutral650,
+        SvgPicture.asset(
+          'assets/icons/shop_merchant_icon.svg',
+          width: 23.w,
+          height: 23.h,
+          colorFilter: ColorFilter.mode(
+            DesignTokens.neutral650,
+            BlendMode.srcIn,
+          ),
         ),
         SizedBox(width: DesignTokens.space1.w),
         Expanded(
@@ -161,7 +166,7 @@ class MerchantCard extends StatelessWidget {
             merchant.name,
             style: TextStyle(
               fontSize: DesignTokens.fontSizeSm.sp,
-              fontWeight: DesignTokens.fontWeightSemiBold,
+              fontWeight: DesignTokens.fontWeightMedium,
               color: DesignTokens.neutral850,
               fontFamily: DesignTokens.fontFamilyPrimary,
             ),
@@ -178,10 +183,10 @@ class MerchantCard extends StatelessWidget {
     return Text(
       '${merchant.distance.toStringAsFixed(1)} km • ${merchant.deliveryTime} min',
       style: TextStyle(
-        fontSize: DesignTokens.fontSizeXs.sp,
+        fontSize: DesignTokens.fontSizeSm.sp,
         fontWeight: DesignTokens.fontWeightRegular,
         color: DesignTokens.neutral650,
-        fontFamily: DesignTokens.fontFamilySecondary,
+        fontFamily: DesignTokens.fontFamilyPrimary,
       ),
     );
   }
@@ -190,11 +195,7 @@ class MerchantCard extends StatelessWidget {
   Widget _buildRating() {
     return Row(
       children: [
-        Icon(
-          Icons.star,
-          size: 14.w,
-          color: DesignTokens.warning500,
-        ),
+        SvgPicture.asset('assets/icons/star.svg', width: 16.w, height: 16.h, colorFilter: ColorFilter.mode(DesignTokens.warning500, BlendMode.srcIn),),
         SizedBox(width: DesignTokens.space1.w),
         Text(
           merchant.rating.toString(),

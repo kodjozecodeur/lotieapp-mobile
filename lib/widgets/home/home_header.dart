@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../core/constants/design_tokens.dart';
 
 /// Home header component
-/// 
+///
 /// This widget displays the header section of the home page with:
 /// - Greeting message "Bonjour, Donald"
 /// - Location dropdown "Agoé 2 lions" with red location icon
 /// - Pass status chip "01 Pass" with green background
 /// - Notification bell icon with red dot indicator
-/// 
+///
 /// All styling uses DesignTokens for consistency.
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -25,22 +26,22 @@ class HomeHeader extends StatelessWidget {
 
   /// User's name for greeting
   final String userName;
-  
+
   /// Current selected location
   final String location;
-  
+
   /// Pass status text
   final String passStatus;
-  
+
   /// Whether user has unread notifications
   final bool hasNotifications;
-  
+
   /// Callback for location dropdown tap
   final VoidCallback? onLocationTapped;
-  
+
   /// Callback for pass status tap
   final VoidCallback? onPassTapped;
-  
+
   /// Callback for notifications bell tap
   final VoidCallback? onNotificationsTapped;
 
@@ -63,18 +64,22 @@ class HomeHeader extends StatelessWidget {
                   fontFamily: DesignTokens.fontFamilyPrimary,
                 ),
               ),
-              
+
               SizedBox(height: DesignTokens.space1.h),
-              
+
               // Location dropdown
               GestureDetector(
                 onTap: onLocationTapped,
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.location_on,
-                      size: DesignTokens.fontSizeBase.w,
-                      color: DesignTokens.error500,
+                    SvgPicture.asset(
+                      'assets/icons/location_icon.svg',
+                      width: 13.w,
+                      height: 13.h,
+                      colorFilter: ColorFilter.mode(
+                        DesignTokens.error500,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     SizedBox(width: DesignTokens.space1.w),
                     Text(
@@ -98,7 +103,7 @@ class HomeHeader extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // Right side - Pass status and notification
         Row(
           children: [
@@ -111,17 +116,20 @@ class HomeHeader extends StatelessWidget {
                   vertical: DesignTokens.space2.h,
                 ),
                 decoration: BoxDecoration(
-                  color: DesignTokens.primary700,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusFull.r),
+                  color: DesignTokens.primary500_8,
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.radiusFull.r,
+                  ),
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 8.w,
-                      height: 8.h,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+                    SvgPicture.asset(
+                      'assets/icons/wallet.svg',
+                      width: 25.w,
+                      height: 25.h,
+                      colorFilter: ColorFilter.mode(
+                        DesignTokens.primary950,
+                        BlendMode.srcIn,
                       ),
                     ),
                     SizedBox(width: DesignTokens.space2.w),
@@ -130,23 +138,23 @@ class HomeHeader extends StatelessWidget {
                       style: TextStyle(
                         fontSize: DesignTokens.fontSizeSm.sp,
                         fontWeight: DesignTokens.fontWeightMedium,
-                        color: Colors.white,
-                        fontFamily: DesignTokens.fontFamilySecondary,
+                        color: DesignTokens.neutral900,
+                        fontFamily: DesignTokens.fontFamilyPrimary,
                       ),
                     ),
                     SizedBox(width: DesignTokens.space1.w),
                     Icon(
                       Icons.chevron_right,
                       size: DesignTokens.fontSizeBase.w,
-                      color: Colors.white,
+                      color: DesignTokens.neutral900,
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             SizedBox(width: DesignTokens.space4.w),
-            
+
             // Notification bell with indicator
             GestureDetector(
               onTap: onNotificationsTapped,
@@ -156,12 +164,20 @@ class HomeHeader extends StatelessWidget {
                 child: Stack(
                   children: [
                     // Bell icon
-                    Icon(
-                      Icons.notifications_outlined,
-                      size: 24.w,
-                      color: DesignTokens.neutral800,
+                    // The notification bell icon is not displaying because the SizedBox parent is only 24x24,
+                    // but the icon is being rendered at 40x40, causing it to be clipped or not visible.
+                    // To fix this, set the icon's width and height to match the SizedBox (24.w, 24.h).
+                    // Also, ensure the asset path is correct and the SVG is included in pubspec.yaml.
+                    SvgPicture.asset(
+                      'assets/icons/notif_bell.svg',
+                      width: 24.w, // Match parent SizedBox width
+                      height: 24.h, // Match parent SizedBox height
+                      colorFilter: ColorFilter.mode(
+                        DesignTokens.neutral900,
+                        BlendMode.srcIn,
+                      ),
                     ),
-                    
+
                     // Red notification dot
                     if (hasNotifications)
                       Positioned(

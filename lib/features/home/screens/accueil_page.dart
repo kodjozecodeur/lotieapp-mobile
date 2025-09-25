@@ -58,50 +58,84 @@ class _AccueilPageState extends State<AccueilPage> {
           // Search Bar
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: DesignTokens.space5.w,
-                vertical: DesignTokens.space4.h,
-              ),
-              child: const SearchBarWidget(),
-            ),
-          ),
-
-          // Category Grid
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
-              child: CategoryGrid(
-                categories: SampleData.categories,
-                onCategoryTapped: _handleCategoryTap,
+              padding: EdgeInsets.only(left: DesignTokens.space2.w,),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(DesignTokens.radius2xl.r),
+                  boxShadow: DesignTokens.shadowSm,
+                ),
+                child: Column(
+                  children: [
+                    // Search Bar
+                    Padding(
+                      padding: EdgeInsets.all(DesignTokens.space4.w),
+                      child: const SearchBarWidget(),
+                    ),
+                    
+                    // Spacing between search bar and category grid
+                    SizedBox(height: DesignTokens.space6.h),
+                    
+                    // Category Grid
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: DesignTokens.space4.w,
+                        right: DesignTokens.space4.w,
+                        bottom: DesignTokens.space4.w,
+                      ),
+                      child: CategoryGrid(
+                        categories: SampleData.categories,
+                        onCategoryTapped: _handleCategoryTap,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
 
           // Spacing
           SliverToBoxAdapter(
-            child: SizedBox(height: DesignTokens.space6.h),
+            child: SizedBox(height: DesignTokens.space4.h),
           ),
 
           // Top Marchands Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
-              child: SectionHeader(
-                title: 'Top Marchands',
-                onSeeAllTapped: _handleSeeAllMerchants,
+              padding: EdgeInsets.only(left: DesignTokens.space2.w,),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(DesignTokens.radius2xl.r),
+                  boxShadow: DesignTokens.shadowSm,
+                ),
+                child: Column(
+                  children: [
+                    // Section Header
+                    Padding(
+                      padding: EdgeInsets.all(DesignTokens.space4.w),
+                      child: SectionHeader(
+                        title: 'Top Marchands',
+                        onSeeAllTapped: _handleSeeAllMerchants,
+                      ),
+                    ),
+                    
+                    // Horizontal Product List
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: DesignTokens.space4.w,
+                        right: DesignTokens.space4.w,
+                        bottom: DesignTokens.space4.w,
+                      ),
+                      child: HorizontalProductList(
+                        merchants: SampleData.topMerchants,
+                        onMerchantTapped: _handleMerchantTap,
+                        onFavoriteTapped: _handleFavoriteTap,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: SizedBox(height: DesignTokens.space4.h),
-          ),
-
-          SliverToBoxAdapter(
-            child: HorizontalProductList(
-              merchants: SampleData.topMerchants,
-              onMerchantTapped: _handleMerchantTap,
-              onFavoriteTapped: _handleFavoriteTap,
             ),
           ),
 

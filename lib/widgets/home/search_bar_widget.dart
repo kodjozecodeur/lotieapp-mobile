@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/design_tokens.dart';
 
 /// Search bar widget component
-/// 
+///
 /// This widget displays a search input field with:
 /// - Gray background container
 /// - Search icon on the left
 /// - Hint text "Rechercher rapide"
 /// - Filter/settings icon on the right
 /// - Rounded corners and proper padding
-/// 
+///
 /// All styling uses DesignTokens for consistency.
 class SearchBarWidget extends StatelessWidget {
   const SearchBarWidget({
@@ -23,13 +24,13 @@ class SearchBarWidget extends StatelessWidget {
 
   /// Hint text for the search field
   final String hintText;
-  
+
   /// Callback when search text changes
   final Function(String)? onSearchChanged;
-  
+
   /// Callback when filter icon is tapped
   final VoidCallback? onFilterTapped;
-  
+
   /// Callback when search is submitted
   final Function(String)? onSearchSubmitted;
 
@@ -46,13 +47,13 @@ class SearchBarWidget extends StatelessWidget {
           // Search icon
           Padding(
             padding: EdgeInsets.only(left: DesignTokens.space4.w),
-            child: Icon(
-              Icons.search,
-              size: 20.w,
-              color: DesignTokens.neutral650,
+            child: SvgPicture.asset(
+              'assets/icons/search_icon.svg',
+              width: 20.w,
+              height: 20.h,
             ),
           ),
-          
+
           // Search input field
           Expanded(
             child: TextField(
@@ -80,16 +81,20 @@ class SearchBarWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Filter/settings icon
           GestureDetector(
             onTap: onFilterTapped,
             child: Container(
               padding: EdgeInsets.all(DesignTokens.space3.w),
-              child: Icon(
-                Icons.tune,
-                size: 20.w,
-                color: DesignTokens.neutral650,
+              child: SvgPicture.asset(
+                'assets/icons/settings.svg',
+                width: 20.w,
+                height: 20.h,
+                colorFilter: ColorFilter.mode(
+                  DesignTokens.neutral850,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),

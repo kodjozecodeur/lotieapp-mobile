@@ -46,11 +46,11 @@ class HorizontalProductList extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 200.h, // Fixed height for horizontal scroll
+      height: 220.h, // Fixed height for horizontal scroll
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
+        padding: EdgeInsets.symmetric(horizontal: DesignTokens.space1.w),
         itemCount: showMerchants ? merchants!.length : products!.length,
         itemBuilder: (context, index) {
           if (showMerchants) {

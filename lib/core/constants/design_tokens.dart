@@ -21,11 +21,13 @@ class DesignTokens {
   static const Color primary300 = Color(0xFF81C784);
   static const Color primary400 = Color(0xFF66BB6A);
   static const Color primary500 = Color(0xFF4CAF50);
+  static const Color primary500_8 = Color(0x14144A19);
   static const Color primary600 = Color(0xFF43A047);
   static const Color primary700 = Color(0xFF388E3C);
   static const Color primary800 = Color(0xFF2E7D32);
   static const Color primary900 = Color(0xFF1B5E20);
   static const Color primary950 = Color(0xFF144A19);
+  
 
   /// Secondary brand colors
   static const Color secondary50 = Color(0xFFF3E5F5);

@@ -42,20 +42,20 @@ class _CategoryGridState extends State<CategoryGrid> {
   }
 
   /// Get color from DesignTokens by name
-  Color _getColorByName(String colorName) {
-    switch (colorName) {
-      case 'success500':
-        return DesignTokens.success500;
-      case 'warning500':
-        return DesignTokens.warning500;
-      case 'error500':
-        return DesignTokens.error500;
-      case 'info500':
-        return DesignTokens.info500;
-      default:
-        return DesignTokens.primary500;
-    }
-  }
+  // Color _getColorByName(String colorName) {
+  //   switch (colorName) {
+  //     case 'success500':
+  //       return DesignTokens.success500;
+  //     case 'warning500':
+  //       return DesignTokens.warning500;
+  //     case 'error500':
+  //       return DesignTokens.error500;
+  //     case 'info500':
+  //       return DesignTokens.info500;
+  //     default:
+  //       return DesignTokens.primary500;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +81,11 @@ class _CategoryGridState extends State<CategoryGrid> {
               final endIndex = (startIndex + itemsPerPage).clamp(0, widget.categories.length);
               final pageCategories = widget.categories.sublist(startIndex, endIndex);
 
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: DesignTokens.space2.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: pageCategories.map((category) {
-                    return _buildCategoryItem(category);
-                  }).toList(),
-                ),
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: pageCategories.map((category) {
+                  return _buildCategoryItem(category);
+                }).toList(),
               );
             },
           ),
@@ -122,10 +119,10 @@ class _CategoryGridState extends State<CategoryGrid> {
                 category.iconPath,
                 width: 32.w,
                 height: 32.h,
-                colorFilter: ColorFilter.mode(
-                  _getColorByName(category.color),
-                  BlendMode.srcIn,
-                ),
+                // colorFilter: ColorFilter.mode(
+                //   _getColorByName(category.color),
+                //   BlendMode.srcIn,
+                // ),
               ),
             ),
           ),

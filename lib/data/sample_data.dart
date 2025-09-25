@@ -17,7 +17,7 @@ class SampleData {
     Category(
       id: 'promotions',
       name: 'Promotions',
-      iconPath: 'assets/icons/promotions_icon.svg',
+      iconPath: 'assets/icons/promotion.svg',
       color: 'success500', // Green percentage icon
       sortOrder: 1,
       productCount: 45,
@@ -25,7 +25,7 @@ class SampleData {
     Category(
       id: 'epicerie',
       name: 'Épicerie',
-      iconPath: 'assets/icons/epicerie_icon.svg',
+      iconPath: 'assets/icons/epicerie.svg',
       color: 'warning500', // Orange basket icon
       sortOrder: 2,
       productCount: 120,
@@ -33,7 +33,7 @@ class SampleData {
     Category(
       id: 'restaurants',
       name: 'Restaurants',
-      iconPath: 'assets/icons/restaurants_icon.svg',
+      iconPath: 'assets/icons/restaurant.svg',
       color: 'error500', // Orange building icon
       sortOrder: 3,
       productCount: 78,
@@ -41,7 +41,7 @@ class SampleData {
     Category(
       id: 'supermarche',
       name: 'Supermarché',
-      iconPath: 'assets/icons/supermarche_icon.svg',
+      iconPath: 'assets/icons/supermarket.svg',
       color: 'info500', // Blue shopping cart icon
       sortOrder: 4,
       productCount: 95,
@@ -53,7 +53,7 @@ class SampleData {
     Merchant(
       id: 'restaurant-1',
       name: 'Restaurants les 2A',
-      imageUrl: 'assets/images/restaurant_2a.jpg',
+      imageUrl: 'assets/images/product_1.png',
       rating: 4.8,
       deliveryTime: 20,
       distance: 15.0,
@@ -67,7 +67,7 @@ class SampleData {
     Merchant(
       id: 'restaurant-2',
       name: 'Chez Mama Africa',
-      imageUrl: 'assets/images/mama_africa.jpg',
+      imageUrl: 'assets/images/product_1.png',
       rating: 4.6,
       deliveryTime: 25,
       distance: 12.5,
@@ -80,7 +80,7 @@ class SampleData {
     Merchant(
       id: 'restaurant-3',
       name: 'Le Gourmet',
-      imageUrl: 'assets/images/le_gourmet.jpg',
+      imageUrl: 'assets/images/product_1.png',
       rating: 4.9,
       deliveryTime: 18,
       distance: 8.2,
@@ -98,7 +98,7 @@ class SampleData {
     Product(
       id: 'promo-1',
       name: 'Grand Combo Nouilles',
-      imageUrl: 'assets/images/combo_nouilles.jpg',
+      imageUrl: 'assets/images/product_1.png',
       price: 2000,
       originalPrice: 2500,
       discountPercentage: 10,
@@ -112,7 +112,7 @@ class SampleData {
     Product(
       id: 'promo-2',
       name: 'Parfum Dior Sauvage',
-      imageUrl: 'assets/images/parfum_dior.jpg',
+      imageUrl: 'assets/images/product_1.png',
       price: 15000,
       originalPrice: 18000,
       discountPercentage: 10,
@@ -126,7 +126,7 @@ class SampleData {
     Product(
       id: 'promo-3',
       name: 'Pizza Margherita',
-      imageUrl: 'assets/images/pizza_margherita.jpg',
+      imageUrl: 'assets/images/product_1.png',
       price: 3500,
       originalPrice: 4000,
       discountPercentage: 10,
@@ -144,7 +144,7 @@ class SampleData {
     Product(
       id: 'rec-1',
       name: 'Salade César',
-      imageUrl: 'assets/images/salade_cesar.jpg',
+      imageUrl: 'assets/images/product_1.png',
       price: 2500,
       merchantId: 'healthy-food',
       merchantName: 'Healthy Food',
@@ -156,7 +156,7 @@ class SampleData {
     Product(
       id: 'rec-2',
       name: 'Smartphone Samsung',
-      imageUrl: 'assets/images/samsung_phone.jpg',
+      imageUrl: 'assets/images/product_1.png',
       price: 85000,
       merchantId: 'tech-store',
       merchantName: 'Tech Store',
@@ -168,7 +168,7 @@ class SampleData {
     Product(
       id: 'rec-3',
       name: 'Burger Deluxe',
-      imageUrl: 'assets/images/burger_deluxe.jpg',
+      imageUrl: 'assets/images/product_1.png',
       price: 4000,
       merchantId: 'burger-king',
       merchantName: 'Burger King',
