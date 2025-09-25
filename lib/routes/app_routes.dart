@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
-import '../screens/loading/loading_screen.dart';
+import '../features/core/screens/home_screen.dart';
+import '../features/core/screens/loading_screen.dart';
 
 /// Application routes configuration
 /// 

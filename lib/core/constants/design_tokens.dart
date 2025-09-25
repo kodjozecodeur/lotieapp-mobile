@@ -38,6 +38,7 @@ class DesignTokens {
   static const Color secondary700 = Color(0xFF7B1FA2);
   static const Color secondary800 = Color(0xFF6A1B9A);
   static const Color secondary900 = Color(0xFF4A148C);
+  static const Color secondary950 = Color(0xFFFFCF19);
 
   /// Neutral colors
   static const Color neutral50 = Color(0xFFFAFAFA);

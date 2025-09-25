@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../screens/splash/splash_screen.dart';
-import '../screens/loading/loading_screen.dart';
-import '../screens/onboarding/onboarding_screen.dart';
-import '../screens/auth/registration_screen.dart';
-import '../screens/auth/login_screen.dart';
-import '../screens/home_screen.dart';
+import '../features/core/screens/splash_screen.dart';
+import '../features/core/screens/loading_screen.dart';
+import '../features/onboarding/screens/onboarding_screen.dart';
+import '../features/auth/screens/registration_screen.dart';
+import '../features/auth/screens/login_screen.dart';
+import '../widgets/navigation/main_shell.dart';
+import '../features/home/screens/accueil_page.dart';
+import '../features/home/screens/rechercher_page.dart';
+import '../features/home/screens/favoris_page.dart';
+import '../features/home/screens/commandes_page.dart';
+import '../features/home/screens/profil_page.dart';
 
 /// Application router configuration using GoRouter
 /// 
@@ -64,12 +69,52 @@ class AppRouter {
         builder: (context, state) => const RegistrationScreen(),
       ),
       
-      // Main App Routes (Protected)
+      // Legacy Home Route (redirect to new structure)
       GoRoute(
         path: '/home',
         name: 'home',
-        builder: (context, state) => const HomeScreen(),
-        // Add authentication guard here if needed
+        redirect: (context, state) => '/home/accueil',
+      ),
+      
+      // Main App Shell with Bottom Navigation
+      ShellRoute(
+        builder: (context, state, child) => MainShell(child: child),
+        routes: [
+          // Accueil (Home) Page
+          GoRoute(
+            path: '/home/accueil',
+            name: 'accueil',
+            builder: (context, state) => const AccueilPage(),
+          ),
+          
+          // Rechercher (Search) Page
+          GoRoute(
+            path: '/home/rechercher',
+            name: 'rechercher',
+            builder: (context, state) => const RechercherPage(),
+          ),
+          
+          // Favoris (Favorites) Page
+          GoRoute(
+            path: '/home/favoris',
+            name: 'favoris',
+            builder: (context, state) => const FavorisPage(),
+          ),
+          
+          // Commandes (Orders) Page
+          GoRoute(
+            path: '/home/commandes',
+            name: 'commandes',
+            builder: (context, state) => const CommandesPage(),
+          ),
+          
+          // Profil (Profile) Page
+          GoRoute(
+            path: '/home/profil',
+            name: 'profil',
+            builder: (context, state) => const ProfilPage(),
+          ),
+        ],
       ),
     ],
     
@@ -133,9 +178,39 @@ class AppRouter {
     context.go('/registration');
   }
 
-  /// Navigate to home screen
+  /// Navigate to OTP screen
+  static void goToOTP(BuildContext context, {String? phoneNumber}) {
+    context.go('/otp');
+  }
+
+  /// Navigate to home screen (redirects to accueil)
   static void goToHome(BuildContext context) {
-    context.go('/home');
+    context.go('/home/accueil');
+  }
+
+  /// Navigate to accueil (main home) page
+  static void goToAccueil(BuildContext context) {
+    context.go('/home/accueil');
+  }
+
+  /// Navigate to rechercher (search) page
+  static void goToRechercher(BuildContext context) {
+    context.go('/home/rechercher');
+  }
+
+  /// Navigate to favoris (favorites) page
+  static void goToFavoris(BuildContext context) {
+    context.go('/home/favoris');
+  }
+
+  /// Navigate to commandes (orders) page
+  static void goToCommandes(BuildContext context) {
+    context.go('/home/commandes');
+  }
+
+  /// Navigate to profil (profile) page
+  static void goToProfil(BuildContext context) {
+    context.go('/home/profil');
   }
 
   /// Navigate back to previous screen
