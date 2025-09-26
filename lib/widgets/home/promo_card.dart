@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../core/constants/design_tokens.dart';
 import '../../models/product.dart';
 
@@ -39,11 +40,11 @@ class PromoCard extends StatelessWidget {
       child: Container(
         width: width.w,
         margin: EdgeInsets.only(right: DesignTokens.space4.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(DesignTokens.cardBorderRadius.r),
-          boxShadow: DesignTokens.shadowBase,
-        ),
+        // decoration: BoxDecoration(
+        //   color: Colors.white,
+        //   borderRadius: BorderRadius.circular(DesignTokens.cardBorderRadius.r),
+        //   boxShadow: DesignTokens.shadowBase,
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -82,19 +83,15 @@ class PromoCard extends StatelessWidget {
     return Container(
       height: 120.h,
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(DesignTokens.cardBorderRadius.r),
-          topRight: Radius.circular(DesignTokens.cardBorderRadius.r),
-        ),
-      ),
+      // decoration: BoxDecoration(
+      //   borderRadius: BorderRadius.circular(DesignTokens.radiusFull),
+      // ),
       child: Stack(
         children: [
           // Product image
           ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(DesignTokens.cardBorderRadius.r),
-              topRight: Radius.circular(DesignTokens.cardBorderRadius.r),
+            borderRadius: BorderRadius.circular(
+              DesignTokens.cardBorderRadius.r,
             ),
             child: Image.asset(
               product.imageUrl,
@@ -127,15 +124,15 @@ class PromoCard extends StatelessWidget {
                   vertical: DesignTokens.space1.h,
                 ),
                 decoration: BoxDecoration(
-                  color: DesignTokens.warning500,
-                  borderRadius: BorderRadius.circular(DesignTokens.radiusSm.r),
+                  color: DesignTokens.secondary950,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusFull.r),
                 ),
                 child: Text(
                   '${product.discountPercentage}% de réduction',
                   style: TextStyle(
                     fontSize: DesignTokens.fontSizeXs.sp,
                     fontWeight: DesignTokens.fontWeightMedium,
-                    color: Colors.white,
+                    color: DesignTokens.neutral850,
                     fontFamily: DesignTokens.fontFamilySecondary,
                   ),
                 ),
@@ -150,16 +147,18 @@ class PromoCard extends StatelessWidget {
               onTap: () => onFavoriteTapped?.call(product.id),
               child: Container(
                 padding: EdgeInsets.all(DesignTokens.space2.w),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFFFFF).withOpacity(0.8),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  product.isFavorite ? Icons.favorite : Icons.favorite_outline,
-                  size: 16.w,
-                  color: product.isFavorite 
-                      ? DesignTokens.error500 
-                      : DesignTokens.neutral650,
+                child: SvgPicture.asset(
+                  'assets/icons/favorite_icon.svg',
+                  width: 20.w,
+                  height: 20.h,
+                  colorFilter: ColorFilter.mode(
+                    DesignTokens.neutral850,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -173,10 +172,14 @@ class PromoCard extends StatelessWidget {
   Widget _buildMerchantInfo() {
     return Row(
       children: [
-        Icon(
-          Icons.store,
-          size: 14.w,
-          color: DesignTokens.neutral650,
+        SvgPicture.asset(
+          'assets/icons/shop_merchant_icon.svg',
+          width: 10.w,
+          height: 10.h,
+          colorFilter: ColorFilter.mode(
+            DesignTokens.neutral650,
+            BlendMode.srcIn,
+          ),
         ),
         SizedBox(width: DesignTokens.space1.w),
         Expanded(
@@ -221,7 +224,7 @@ class PromoCard extends StatelessWidget {
           style: TextStyle(
             fontSize: DesignTokens.fontSizeSm.sp,
             fontWeight: DesignTokens.fontWeightBold,
-            color: DesignTokens.neutral850,
+            color: DesignTokens.primary950,
             fontFamily: DesignTokens.fontFamilyPrimary,
           ),
         ),
@@ -235,7 +238,7 @@ class PromoCard extends StatelessWidget {
               fontSize: DesignTokens.fontSizeXs.sp,
               fontWeight: DesignTokens.fontWeightRegular,
               color: DesignTokens.neutral650,
-              fontFamily: DesignTokens.fontFamilySecondary,
+              fontFamily: DesignTokens.fontFamilyPrimary,
               decoration: TextDecoration.lineThrough,
             ),
           ),

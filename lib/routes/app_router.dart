@@ -11,6 +11,7 @@ import '../features/home/screens/rechercher_page.dart';
 import '../features/home/screens/favoris_page.dart';
 import '../features/home/screens/commandes_page.dart';
 import '../features/home/screens/profil_page.dart';
+import '../features/home/screens/top_marchands_page.dart';
 
 /// Application router configuration using GoRouter
 /// 
@@ -114,6 +115,13 @@ class AppRouter {
             name: 'profil',
             builder: (context, state) => const ProfilPage(),
           ),
+          
+          // Top Marchands Page
+          GoRoute(
+            path: '/home/top-marchands',
+            name: 'top-marchands',
+            builder: (context, state) => const TopMarchandsPage(),
+          ),
         ],
       ),
     ],
@@ -211,6 +219,11 @@ class AppRouter {
   /// Navigate to profil (profile) page
   static void goToProfil(BuildContext context) {
     context.go('/home/profil');
+  }
+
+  /// Navigate to top marchands (top merchants) page
+  static void goToTopMarchands(BuildContext context) {
+    context.push('/home/top-marchands');
   }
 
   /// Navigate back to previous screen

@@ -7,6 +7,7 @@ import '../../../widgets/home/category_grid.dart';
 import '../../../widgets/home/section_header.dart';
 import '../../../widgets/home/horizontal_product_list.dart';
 import '../../../data/sample_data.dart';
+import '../../../routes/app_router.dart';
 
 /// Accueil (Home) page - main dashboard of the app
 /// 
@@ -147,23 +148,40 @@ class _AccueilPageState extends State<AccueilPage> {
           // Promotions Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
-              child: SectionHeader(
-                title: 'Promotions',
-                onSeeAllTapped: _handleSeeAllPromotions,
+              padding: EdgeInsets.only(left: DesignTokens.space2.w),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(DesignTokens.radius2xl.r),
+                  boxShadow: DesignTokens.shadowSm,
+                ),
+                child: Column(
+                  children: [
+                    // Section Header
+                    Padding(
+                      padding: EdgeInsets.all(DesignTokens.space4.w),
+                      child: SectionHeader(
+                        title: 'Promotions',
+                        onSeeAllTapped: _handleSeeAllPromotions,
+                      ),
+                    ),
+                    
+                    // Horizontal Product List
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: DesignTokens.space4.w,
+                        right: DesignTokens.space4.w,
+                        bottom: DesignTokens.space4.w,
+                      ),
+                      child: HorizontalProductList(
+                        products: SampleData.promotionProducts,
+                        onProductTapped: _handleProductTap,
+                        onFavoriteTapped: _handleFavoriteTap,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: SizedBox(height: DesignTokens.space4.h),
-          ),
-
-          SliverToBoxAdapter(
-            child: HorizontalProductList(
-              products: SampleData.promotionProducts,
-              onProductTapped: _handleProductTap,
-              onFavoriteTapped: _handleFavoriteTap,
             ),
           ),
 
@@ -216,8 +234,8 @@ class _AccueilPageState extends State<AccueilPage> {
 
   /// Handle see all merchants
   void _handleSeeAllMerchants() {
-    // TODO: Navigate to merchants list page
-    debugPrint('See all merchants tapped');
+    // Navigate to Top Marchands page
+    AppRouter.goToTopMarchands(context);
   }
 
   /// Handle see all promotions

@@ -1,6 +1,7 @@
 import '../models/merchant.dart';
 import '../models/product.dart';
 import '../models/category.dart';
+import '../models/top_merchant.dart';
 
 /// Sample data for testing and development
 /// 
@@ -214,6 +215,106 @@ class SampleData {
       return null;
     }
   }
+
+  /// Top merchants data for the Top Marchands page
+  static const List<TopMerchant> topMerchantsList = [
+    TopMerchant(
+      id: 'restaurant_2a',
+      businessName: 'Restaurant les 2A',
+      category: 'Southern',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Fried Chicken',
+      priceFrom: 'À partir de 2 000 FCFA',
+      distance: '3km',
+      duration: '5 min',
+      rating: 4.4,
+      isFavorite: false,
+    ),
+    TopMerchant(
+      id: 'shop_zara',
+      businessName: 'Shop Zara',
+      category: 'Bien-être',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Habits',
+      priceFrom: 'À partir de 1 500 FCFA',
+      distance: '2.5km',
+      duration: '8 min',
+      rating: 4.2,
+      isFavorite: true,
+    ),
+    TopMerchant(
+      id: 'parfumerie_ville',
+      businessName: 'Parfumerie en Ville',
+      category: 'Bien-être',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Parfumerie',
+      priceFrom: 'À partir de 3 500 FCFA',
+      distance: '1.8km',
+      duration: '3 min',
+      rating: 4.6,
+      isFavorite: false,
+    ),
+    TopMerchant(
+      id: 'pharmacie_avepozo',
+      businessName: 'Pharmacie Avepozo',
+      category: 'Santé',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Pharmacie',
+      priceFrom: 'À partir de 500 FCFA',
+      distance: '4.2km',
+      duration: '12 min',
+      rating: 4.5,
+      isFavorite: false,
+    ),
+    TopMerchant(
+      id: 'togo_mall',
+      businessName: 'Togo Mall',
+      category: 'Shopping',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Centre Commercial',
+      priceFrom: 'À partir de 1 000 FCFA',
+      distance: '5.5km',
+      duration: '15 min',
+      rating: 4.3,
+      isFavorite: true,
+    ),
+    TopMerchant(
+      id: 'restaurant_delice',
+      businessName: 'Restaurant Délice',
+      category: 'International',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Cuisine Française',
+      priceFrom: 'À partir de 4 500 FCFA',
+      distance: '2.2km',
+      duration: '6 min',
+      rating: 4.7,
+      isFavorite: false,
+    ),
+    TopMerchant(
+      id: 'supermarche_champion',
+      businessName: 'Supermarché Champion',
+      category: 'Alimentation',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Supermarché',
+      priceFrom: 'À partir de 800 FCFA',
+      distance: '3.8km',
+      duration: '10 min',
+      rating: 4.1,
+      isFavorite: false,
+    ),
+    TopMerchant(
+      id: 'boulangerie_moderne',
+      businessName: 'Boulangerie Moderne',
+      category: 'Alimentation',
+      imageUrl: 'assets/images/product_1.png',
+      subcategory: 'Boulangerie',
+      priceFrom: 'À partir de 300 FCFA',
+      distance: '1.5km',
+      duration: '4 min',
+      rating: 4.8,
+      isFavorite: true,
+    ),
+  ];
 
   /// Simulate API loading delay for testing
   static Future<T> simulateApiCall<T>(T data, {Duration delay = const Duration(milliseconds: 800)}) async {

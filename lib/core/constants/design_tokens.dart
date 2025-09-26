@@ -41,6 +41,7 @@ class DesignTokens {
   static const Color secondary800 = Color(0xFF6A1B9A);
   static const Color secondary900 = Color(0xFF4A148C);
   static const Color secondary950 = Color(0xFFFFCF19);
+  static const Color secondarykbackground950 = Color(0xFFFEF4EC);
 
   /// Neutral colors
   static const Color neutral50 = Color(0xFFFAFAFA);
@@ -66,6 +67,7 @@ class DesignTokens {
   static const Color warning50 = Color(0xFFFFF3E0);
   static const Color warning500 = Color(0xFFFF9800);
   static const Color warning700 = Color(0xFFF57C00);
+  static const Color warning950 = Color(0xFFFDBE2D);
 
   static const Color error50 = Color(0xFFFFEBEE);
   static const Color error500 = Color(0xFFF44336);
