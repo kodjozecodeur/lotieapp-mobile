@@ -2,6 +2,7 @@ import '../models/merchant.dart';
 import '../models/product.dart';
 import '../models/category.dart';
 import '../models/top_merchant.dart';
+import '../models/menu_item.dart';
 
 /// Sample data for testing and development
 /// 
@@ -315,6 +316,165 @@ class SampleData {
       isFavorite: true,
     ),
   ];
+
+  /// Sample menu items for different merchants
+  static const List<MenuItem> menuItems = [
+    // Restaurant les 2A items
+    MenuItem(
+      id: 'resto_2a_noodles',
+      name: 'Grand combo de nouilles',
+      price: 1600,
+      currency: 'FCFA',
+      description: 'Nouilles sautées avec légumes et viande',
+      imageUrl: 'assets/images/product_1.png',
+      category: 'Noodles',
+      preparationTime: 15,
+      tags: ['populaire', 'épicé'],
+    ),
+    MenuItem(
+      id: 'resto_2a_chicken',
+      name: 'Poulet sésame',
+      price: 1600,
+      currency: 'FCFA',
+      description: 'Poulet frit au sésame avec riz',
+      imageUrl: 'assets/images/product_img_1.jpg',
+      category: 'Riz',
+      preparationTime: 20,
+      tags: ['croustillant'],
+    ),
+    MenuItem(
+      id: 'resto_2a_vegetables',
+      name: 'Légumes sautés',
+      price: 1600,
+      currency: 'FCFA',
+      description: 'Mélange de légumes frais sautés',
+      imageUrl: 'assets/images/logo.png',
+      category: 'Légumes',
+      preparationTime: 10,
+      tags: ['végétarien', 'santé'],
+    ),
+    MenuItem(
+      id: 'resto_2a_drink',
+      name: 'Jus de fruits frais',
+      price: 500,
+      currency: 'FCFA',
+      description: 'Jus naturel de fruits de saison',
+      imageUrl: 'assets/images/product_1.png',
+      category: 'Boissons',
+      preparationTime: 5,
+      tags: ['rafraîchissant'],
+    ),
+
+    // Shop Zara items
+    MenuItem(
+      id: 'zara_tshirt',
+      name: 'T-shirt coton bio',
+      price: 2500,
+      currency: 'FCFA',
+      description: 'T-shirt 100% coton biologique',
+      imageUrl: 'assets/images/product_img_1.jpg',
+      category: 'Vêtements',
+      tags: ['bio', 'confort'],
+    ),
+    MenuItem(
+      id: 'zara_jeans',
+      name: 'Jean slim fit',
+      price: 4500,
+      currency: 'FCFA',
+      description: 'Jean coupe slim moderne',
+      imageUrl: 'assets/images/product_1.png',
+      category: 'Vêtements',
+      tags: ['moderne', 'tendance'],
+    ),
+    MenuItem(
+      id: 'zara_shoes',
+      name: 'Chaussures sport',
+      price: 6000,
+      currency: 'FCFA',
+      description: 'Baskets de sport confortables',
+      imageUrl: 'assets/images/logo.png',
+      category: 'Chaussures',
+      tags: ['sport', 'confort'],
+    ),
+
+    // Parfumerie en Ville items
+    MenuItem(
+      id: 'parfum_chanel',
+      name: 'Parfum Chanel No.5',
+      price: 15000,
+      currency: 'FCFA',
+      description: 'Parfum classique et élégant',
+      imageUrl: 'assets/images/product_1.png',
+      category: 'Parfums',
+      tags: ['luxe', 'classique'],
+    ),
+    MenuItem(
+      id: 'parfum_lotion',
+      name: 'Lotion hydratante',
+      price: 3500,
+      currency: 'FCFA',
+      description: 'Crème hydratante pour visage',
+      imageUrl: 'assets/images/product_img_1.jpg',
+      category: 'Soins',
+      tags: ['hydratant', 'naturel'],
+    ),
+
+    // Pharmacie Avepozo items
+    MenuItem(
+      id: 'pharma_paracetamol',
+      name: 'Paracétamol 500mg',
+      price: 800,
+      currency: 'FCFA',
+      description: 'Antalgique et antipyrétique',
+      imageUrl: 'assets/images/logo.png',
+      category: 'Médicaments',
+      tags: ['ordonnance-libre'],
+    ),
+    MenuItem(
+      id: 'pharma_vitamins',
+      name: 'Vitamines C + D',
+      price: 2500,
+      currency: 'FCFA',
+      description: 'Complément vitaminique',
+      imageUrl: 'assets/images/product_1.png',
+      category: 'Compléments',
+      tags: ['santé', 'immunité'],
+    ),
+  ];
+
+  /// Get menu items for a specific merchant
+  static List<MenuItem> getMenuItemsForMerchant(String merchantId) {
+    switch (merchantId) {
+      case 'restaurant_2a':
+        return menuItems.where((item) => item.id.startsWith('resto_2a')).toList();
+      case 'shop_zara':
+        return menuItems.where((item) => item.id.startsWith('zara')).toList();
+      case 'parfumerie_ville':
+        return menuItems.where((item) => item.id.startsWith('parfum')).toList();
+      case 'pharmacie_avepozo':
+        return menuItems.where((item) => item.id.startsWith('pharma')).toList();
+      default:
+        // Return a default set for other merchants
+        return [
+          const MenuItem(
+            id: 'default_item_1',
+            name: 'Produit 1',
+            price: 1000,
+            currency: 'FCFA',
+            description: 'Produit de qualité',
+            category: 'Général',
+          ),
+          const MenuItem(
+            id: 'default_item_2',
+            name: 'Produit 2',
+            price: 1500,
+            currency: 'FCFA',
+            description: 'Excellent choix',
+            category: 'Général',
+          ),
+        ];
+    }
+  }
 
   /// Simulate API loading delay for testing
   static Future<T> simulateApiCall<T>(T data, {Duration delay = const Duration(milliseconds: 800)}) async {

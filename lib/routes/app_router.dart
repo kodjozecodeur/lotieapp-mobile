@@ -12,6 +12,8 @@ import '../features/home/screens/favoris_page.dart';
 import '../features/home/screens/commandes_page.dart';
 import '../features/home/screens/profil_page.dart';
 import '../features/home/screens/top_marchands_page.dart';
+import '../features/merchants/screens/merchant_detail_page.dart';
+import '../data/sample_data.dart';
 
 /// Application router configuration using GoRouter
 /// 
@@ -124,6 +126,20 @@ class AppRouter {
           ),
         ],
       ),
+      
+      // Merchant Detail Page (full screen modal)
+      GoRoute(
+        path: '/merchant/:merchantId',
+        name: 'merchant-detail',
+        builder: (context, state) {
+          final merchantId = state.pathParameters['merchantId']!;
+          final merchant = SampleData.topMerchantsList.firstWhere(
+            (m) => m.id == merchantId,
+            orElse: () => SampleData.topMerchantsList.first,
+          );
+          return MerchantDetailPage(merchant: merchant);
+        },
+      ),
     ],
     
     // Error page builder
@@ -224,6 +240,11 @@ class AppRouter {
   /// Navigate to top marchands (top merchants) page
   static void goToTopMarchands(BuildContext context) {
     context.push('/home/top-marchands');
+  }
+
+  /// Navigate to merchant detail page
+  static void goToMerchantDetail(BuildContext context, String merchantId) {
+    context.push('/merchant/$merchantId');
   }
 
   /// Navigate back to previous screen

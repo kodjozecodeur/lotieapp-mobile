@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lotieapp/routes/app_router.dart';
 import '../../../core/constants/design_tokens.dart';
 import '../../../widgets/home/search_bar_widget.dart';
 import '../../../widgets/marchands/top_merchant_card.dart';
@@ -513,8 +514,8 @@ class _TopMarchandsPageState extends State<TopMarchandsPage>
 
   /// Handle merchant card tap
   void _handleMerchantTap(String merchantId) {
-    // TODO: Navigate to merchant detail page
-    debugPrint('[TopMarchandsPage] Merchant tapped: $merchantId');
+    // Navigate to merchant detail page
+    AppRouter.goToMerchantDetail(context, merchantId);
   }
 
   /// Handle favorite tap
