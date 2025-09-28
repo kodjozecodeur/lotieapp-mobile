@@ -106,7 +106,7 @@ final authErrorProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthErrorRef = AutoDisposeProviderRef<String?>;
-String _$authNotifierHash() => r'3fa41b6a1814c00297eb9a7072eb51c6b80da30d';
+String _$authNotifierHash() => r'88fbfa0d0c7b71f69b0128b670dc0d32e11bd1d5';
 
 /// Riverpod notifier for authentication state
 ///

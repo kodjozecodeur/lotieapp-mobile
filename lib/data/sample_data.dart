@@ -476,6 +476,15 @@ class SampleData {
     }
   }
 
+  /// Get a specific menu item by ID
+  static MenuItem? getMenuItemById(String itemId) {
+    try {
+      return menuItems.firstWhere((item) => item.id == itemId);
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Simulate API loading delay for testing
   static Future<T> simulateApiCall<T>(T data, {Duration delay = const Duration(milliseconds: 800)}) async {
     await Future.delayed(delay);
@@ -486,5 +495,116 @@ class SampleData {
   static Future<T> simulateApiError<T>({Duration delay = const Duration(milliseconds: 500)}) async {
     await Future.delayed(delay);
     throw Exception('Simulated API error for testing');
+  }
+
+  /// Supermarket listings data
+  static List<TopMerchant> get supermarketsList {
+    return [
+      TopMerchant(
+        id: 'champion_baguida',
+        businessName: 'Le Champion Baguida',
+        category: 'Supermarché',
+        subcategory: 'Général',
+        priceFrom: 'Livraison gratuite',
+        distance: '15 km',
+        duration: '15-20 min',
+        rating: 4.4,
+        imageUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400',
+        isFavorite: false,
+        merchantType: MerchantType.supermarket,
+        productCategories: ['Bien être', 'Électroniques', 'Alimentation', 'Hygiène'],
+      ),
+      TopMerchant(
+        id: 'carrefour_lome',
+        businessName: 'Carrefour Lomé',
+        category: 'Supermarché',
+        subcategory: 'Général',
+        priceFrom: 'Livraison gratuite',
+        distance: '8 km',
+        duration: '10-15 min',
+        rating: 4.6,
+        imageUrl: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400',
+        isFavorite: true,
+        merchantType: MerchantType.supermarket,
+        productCategories: ['Alimentation', 'Électroniques', 'Maison', 'Mode'],
+      ),
+      TopMerchant(
+        id: 'shoprite_akodessewa',
+        businessName: 'Shoprite Akodessewa',
+        category: 'Supermarché',
+        subcategory: 'Général',
+        priceFrom: 'Livraison gratuite',
+        distance: '12 km',
+        duration: '12-18 min',
+        rating: 4.2,
+        imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
+        isFavorite: false,
+        merchantType: MerchantType.supermarket,
+        productCategories: ['Alimentation', 'Bien être', 'Bébé', 'Maison'],
+      ),
+      TopMerchant(
+        id: 'casino_tokoin',
+        businessName: 'Casino Tokoin',
+        category: 'Supermarché',
+        subcategory: 'Général',
+        priceFrom: 'Livraison gratuite',
+        distance: '6 km',
+        duration: '8-12 min',
+        rating: 4.3,
+        imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
+        isFavorite: false,
+        merchantType: MerchantType.supermarket,
+        productCategories: ['Alimentation', 'Électroniques', 'Mode', 'Sport'],
+      ),
+      TopMerchant(
+        id: 'jumbo_plaza',
+        businessName: 'Jumbo Plaza',
+        category: 'Supermarché',
+        subcategory: 'Général',
+        priceFrom: 'Livraison gratuite',
+        distance: '20 km',
+        duration: '20-25 min',
+        rating: 4.1,
+        imageUrl: 'https://images.unsplash.com/photo-1555529902-1c8b2c4c0e8b?w=400',
+        isFavorite: false,
+        merchantType: MerchantType.supermarket,
+        productCategories: ['Alimentation', 'Maison', 'Jardin', 'Auto'],
+      ),
+      TopMerchant(
+        id: 'super_u_agbalepedo',
+        businessName: 'Super U Agbalepedo',
+        category: 'Supermarché',
+        subcategory: 'Général',
+        priceFrom: 'Livraison gratuite',
+        distance: '10 km',
+        duration: '10-15 min',
+        rating: 4.5,
+        imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
+        isFavorite: true,
+        merchantType: MerchantType.supermarket,
+        productCategories: ['Alimentation', 'Bien être', 'Bébé', 'Électroniques'],
+      ),
+    ];
+  }
+
+  /// Get supermarkets by search query
+  static List<TopMerchant> searchSupermarkets(String query) {
+    if (query.isEmpty) return supermarketsList;
+    
+    final lowercaseQuery = query.toLowerCase();
+    return supermarketsList.where((supermarket) {
+      return supermarket.businessName.toLowerCase().contains(lowercaseQuery) ||
+             supermarket.productCategories.any((category) => 
+               category.toLowerCase().contains(lowercaseQuery));
+    }).toList();
+  }
+
+  /// Get supermarkets by category filter
+  static List<TopMerchant> filterSupermarketsByCategory(String category) {
+    if (category.isEmpty) return supermarketsList;
+    
+    return supermarketsList.where((supermarket) {
+      return supermarket.productCategories.contains(category);
+    }).toList();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'core/di/service_locator.dart';
 import 'core/utils/logger.dart';
@@ -28,8 +29,12 @@ void main() async {
       DeviceOrientation.portraitDown,
     ]);
 
-    // Run the app
-    runApp(const App());
+    // Run the app with Riverpod
+    runApp(
+      ProviderScope(
+        child: const App(),
+      ),
+    );
     logger.info('[Main] App started successfully');
   } catch (error, stackTrace) {
     logger.fatal('[Main] Failed to start app', error, stackTrace);

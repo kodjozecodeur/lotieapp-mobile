@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/design_tokens.dart';
 import '../../models/nav_item.dart';
 import '../../core/config/navigation_config.dart';
 import '../../core/utils/logger.dart';
+import '../../providers/cart_provider.dart';
 
 /// Floating bottom navigation bar component
 /// 
@@ -21,7 +23,7 @@ import '../../core/utils/logger.dart';
 /// - SVG icon support
 /// - Apple-style visual design
 /// - Responsive sizing using ScreenUtil
-class FloatingBottomNavBar extends StatefulWidget {
+class FloatingBottomNavBar extends ConsumerStatefulWidget {
   const FloatingBottomNavBar({
     super.key,
     required this.currentRoute,
@@ -31,10 +33,10 @@ class FloatingBottomNavBar extends StatefulWidget {
   final String currentRoute;
 
   @override
-  State<FloatingBottomNavBar> createState() => _FloatingBottomNavBarState();
+  ConsumerState<FloatingBottomNavBar> createState() => _FloatingBottomNavBarState();
 }
 
-class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
+class _FloatingBottomNavBarState extends ConsumerState<FloatingBottomNavBar>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -131,6 +133,7 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
   @override
   Widget build(BuildContext context) {
     final currentIndex = _currentIndex;
+    final cartState = ref.watch(cartProvider);
     logger.debug('[FloatingBottomNavBar] Building navbar, currentIndex: $currentIndex');
     
     return AnimatedBuilder(
@@ -157,10 +160,14 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
                   NavigationConfig.bottomNavItems.length,
                   (index) {
                     final isActive = _currentIndex == index;
+                    final navItem = NavigationConfig.bottomNavItems[index];
+                    final showCartBadge = navItem.id == 'commandes' && cartState.totalItems > 0;
                     return _buildNavItem(
-                      NavigationConfig.bottomNavItems[index],
+                      navItem,
                       index,
                       isActive,
+                      showCartBadge: showCartBadge,
+                      cartItemCount: cartState.totalItems,
                     );
                   },
                 ),
@@ -173,7 +180,7 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
   }
 
   /// Build individual navigation item
-  Widget _buildNavItem(NavItem navItem, int index, bool isActive) {
+  Widget _buildNavItem(NavItem navItem, int index, bool isActive, {bool showCartBadge = false, int cartItemCount = 0}) {
     logger.debug('[FloatingBottomNavBar] Building nav item ${navItem.label} at index $index, isActive: $isActive');
     
     return Expanded(
@@ -201,7 +208,17 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
                 )
               : null,
           child: Center(
-            child: _buildNavContent(navItem, isActive),
+            child: Stack(
+              children: [
+                _buildNavContent(navItem, isActive),
+                if (showCartBadge)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: _buildCartBadge(cartItemCount),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -265,5 +282,35 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar>
         color: isActive ? DesignTokens.primary900 : Colors.white,
       );
     }
+  }
+
+  /// Build cart badge for navigation items
+  Widget _buildCartBadge(int itemCount) {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Colors.white,
+          width: 2.w,
+        ),
+      ),
+      constraints: BoxConstraints(
+        minWidth: 20.w,
+        minHeight: 20.w,
+      ),
+      child: Center(
+        child: Text(
+          '$itemCount',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.bold,
+            fontFamily: DesignTokens.fontFamilyPrimary,
+          ),
+        ),
+      ),
+    );
   }
 }

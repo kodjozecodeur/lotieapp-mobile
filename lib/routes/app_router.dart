@@ -13,6 +13,7 @@ import '../features/home/screens/commandes_page.dart';
 import '../features/home/screens/profil_page.dart';
 import '../features/home/screens/top_marchands_page.dart';
 import '../features/merchants/screens/merchant_detail_page.dart';
+import '../features/supermarkets/screens/supermarket_listing_page.dart';
 import '../data/sample_data.dart';
 
 /// Application router configuration using GoRouter
@@ -123,6 +124,13 @@ class AppRouter {
             path: '/home/top-marchands',
             name: 'top-marchands',
             builder: (context, state) => const TopMarchandsPage(),
+          ),
+          
+          // Supermarkets Page
+          GoRoute(
+            path: '/home/supermarches',
+            name: 'supermarches',
+            builder: (context, state) => const SupermarketListingPage(),
           ),
         ],
       ),

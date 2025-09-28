@@ -1,5 +1,15 @@
 import 'package:flutter/foundation.dart';
 
+/// Merchant types enum
+enum MerchantType {
+  restaurant,
+  supermarket,
+  pharmacy,
+  electronics,
+  clothing,
+  other,
+}
+
 /// Top Merchant model for the Top Marchands page
 /// 
 /// This model represents merchants displayed in the top merchants list
@@ -17,6 +27,8 @@ class TopMerchant {
     required this.rating,
     this.imageUrl,
     this.isFavorite = false,
+    this.merchantType = MerchantType.restaurant,
+    this.productCategories = const [],
   });
 
   /// Unique identifier
@@ -48,6 +60,12 @@ class TopMerchant {
   
   /// Whether merchant is favorited
   final bool isFavorite;
+  
+  /// Type of merchant (restaurant, supermarket, etc.)
+  final MerchantType merchantType;
+  
+  /// Product categories for search (supermarkets, electronics, etc.)
+  final List<String> productCategories;
 
   /// Create TopMerchant from JSON
   factory TopMerchant.fromJson(Map<String, dynamic> json) {
@@ -62,6 +80,13 @@ class TopMerchant {
       rating: (json['rating'] as num).toDouble(),
       imageUrl: json['image_url'] as String?,
       isFavorite: json['is_favorite'] as bool? ?? false,
+      merchantType: MerchantType.values.firstWhere(
+        (type) => type.name == json['merchant_type'],
+        orElse: () => MerchantType.restaurant,
+      ),
+      productCategories: (json['product_categories'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ?? [],
     );
   }
 
@@ -78,6 +103,8 @@ class TopMerchant {
       'rating': rating,
       'image_url': imageUrl,
       'is_favorite': isFavorite,
+      'merchant_type': merchantType.name,
+      'product_categories': productCategories,
     };
   }
 
@@ -93,6 +120,8 @@ class TopMerchant {
     double? rating,
     String? imageUrl,
     bool? isFavorite,
+    MerchantType? merchantType,
+    List<String>? productCategories,
   }) {
     return TopMerchant(
       id: id ?? this.id,
@@ -105,6 +134,8 @@ class TopMerchant {
       rating: rating ?? this.rating,
       imageUrl: imageUrl ?? this.imageUrl,
       isFavorite: isFavorite ?? this.isFavorite,
+      merchantType: merchantType ?? this.merchantType,
+      productCategories: productCategories ?? this.productCategories,
     );
   }
 

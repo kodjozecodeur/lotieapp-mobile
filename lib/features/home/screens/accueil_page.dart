@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/design_tokens.dart';
 import '../../../widgets/home/home_header.dart';
 import '../../../widgets/home/search_bar_widget.dart';
@@ -228,8 +229,20 @@ class _AccueilPageState extends State<AccueilPage> {
 
   /// Handle category tap
   void _handleCategoryTap(String categoryId) {
-    // TODO: Navigate to category page or filter products
-    debugPrint('Category tapped: $categoryId');
+    switch (categoryId) {
+      case 'supermarche':
+        // Navigate to supermarkets page
+        context.go('/home/supermarches');
+        break;
+      case 'restaurants':
+        // Navigate to restaurants page
+        AppRouter.goToTopMarchands(context);
+        break;
+      default:
+        // TODO: Navigate to other category pages
+        debugPrint('Category tapped: $categoryId');
+        break;
+    }
   }
 
   /// Handle see all merchants
