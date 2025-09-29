@@ -45,3 +45,5 @@ app.*.map.json
 /android/app/release
 # cursor rules related
 .cursor/rules/
+#docs related
+docs/
