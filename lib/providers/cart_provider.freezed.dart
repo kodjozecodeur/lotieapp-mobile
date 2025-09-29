@@ -26,6 +26,7 @@ mixin _$CartState {
   double get totalPrice => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   String? get error => throw _privateConstructorUsedError;
+  String get context => throw _privateConstructorUsedError;
 
   /// Serializes this CartState to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,6 +49,7 @@ abstract class $CartStateCopyWith<$Res> {
     double totalPrice,
     bool isLoading,
     String? error,
+    String context,
   });
 }
 
@@ -71,6 +73,7 @@ class _$CartStateCopyWithImpl<$Res, $Val extends CartState>
     Object? totalPrice = null,
     Object? isLoading = null,
     Object? error = freezed,
+    Object? context = null,
   }) {
     return _then(
       _value.copyWith(
@@ -94,6 +97,10 @@ class _$CartStateCopyWithImpl<$Res, $Val extends CartState>
                 ? _value.error
                 : error // ignore: cast_nullable_to_non_nullable
                       as String?,
+            context: null == context
+                ? _value.context
+                : context // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -115,6 +122,7 @@ abstract class _$$CartStateImplCopyWith<$Res>
     double totalPrice,
     bool isLoading,
     String? error,
+    String context,
   });
 }
 
@@ -137,6 +145,7 @@ class __$$CartStateImplCopyWithImpl<$Res>
     Object? totalPrice = null,
     Object? isLoading = null,
     Object? error = freezed,
+    Object? context = null,
   }) {
     return _then(
       _$CartStateImpl(
@@ -160,6 +169,10 @@ class __$$CartStateImplCopyWithImpl<$Res>
             ? _value.error
             : error // ignore: cast_nullable_to_non_nullable
                   as String?,
+        context: null == context
+            ? _value.context
+            : context // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -174,6 +187,7 @@ class _$CartStateImpl implements _CartState {
     this.totalPrice = 0.0,
     this.isLoading = false,
     this.error,
+    this.context = 'restaurant',
   }) : _items = items;
 
   factory _$CartStateImpl.fromJson(Map<String, dynamic> json) =>
@@ -199,10 +213,13 @@ class _$CartStateImpl implements _CartState {
   final bool isLoading;
   @override
   final String? error;
+  @override
+  @JsonKey()
+  final String context;
 
   @override
   String toString() {
-    return 'CartState(items: $items, totalItems: $totalItems, totalPrice: $totalPrice, isLoading: $isLoading, error: $error)';
+    return 'CartState(items: $items, totalItems: $totalItems, totalPrice: $totalPrice, isLoading: $isLoading, error: $error, context: $context)';
   }
 
   @override
@@ -217,7 +234,8 @@ class _$CartStateImpl implements _CartState {
                 other.totalPrice == totalPrice) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
-            (identical(other.error, error) || other.error == error));
+            (identical(other.error, error) || other.error == error) &&
+            (identical(other.context, context) || other.context == context));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -229,6 +247,7 @@ class _$CartStateImpl implements _CartState {
     totalPrice,
     isLoading,
     error,
+    context,
   );
 
   /// Create a copy of CartState
@@ -252,6 +271,7 @@ abstract class _CartState implements CartState {
     final double totalPrice,
     final bool isLoading,
     final String? error,
+    final String context,
   }) = _$CartStateImpl;
 
   factory _CartState.fromJson(Map<String, dynamic> json) =
@@ -267,6 +287,8 @@ abstract class _CartState implements CartState {
   bool get isLoading;
   @override
   String? get error;
+  @override
+  String get context;
 
   /// Create a copy of CartState
   /// with the given fields replaced by the non-null parameter values.

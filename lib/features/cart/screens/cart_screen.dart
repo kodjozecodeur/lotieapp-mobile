@@ -67,64 +67,71 @@ class CartScreen extends ConsumerWidget {
 
   /// Build empty cart state
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/empty_cart.svg',
-            width: 100.w,
-            height: 100.h,
-            // colorFilter: ColorFilter.mode(
-            //   DesignTokens.neutral500,
-            //   BlendMode.srcIn,
-            // ),
-          ),
-          SizedBox(height: 24.h),
-          Text(
-            'Votre panier est vide',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeXl.sp,
-              color: DesignTokens.neutral900,
-              fontWeight: FontWeight.w600,
-              fontFamily: DesignTokens.fontFamilyPrimary,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            'Ajoutez des articles pour commencer',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeBase.sp,
-              color: DesignTokens.neutral500,
-              fontFamily: DesignTokens.fontFamilyPrimary,
-            ),
-          ),
-          SizedBox(height: 32.h),
-          ElevatedButton(
-            onPressed: () => context.go('/home/top-marchands'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: DesignTokens.primary950,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(
-                horizontal: 32.w,
-                vertical: 16.h,
+    return Consumer(
+      builder: (context, ref, child) {
+        final cartState = ref.watch(cartProvider);
+        final isSupermarket = cartState.context == 'supermarket';
+        
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/empty_cart.svg',
+                width: 100.w,
+                height: 100.h,
+                // colorFilter: ColorFilter.mode(
+                //   DesignTokens.neutral500,
+                //   BlendMode.srcIn,
+                // ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.radiusMd.r),
+              SizedBox(height: 24.h),
+              Text(
+                'Votre panier est vide',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeXl.sp,
+                  color: DesignTokens.neutral900,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: DesignTokens.fontFamilyPrimary,
+                ),
               ),
-            ),
-            child: Text(
-              'Explorer les restaurants',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeBase.sp,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontFamily: DesignTokens.fontFamilyPrimary,
+              SizedBox(height: 8.h),
+              Text(
+                'Ajoutez des articles pour commencer',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeBase.sp,
+                  color: DesignTokens.neutral500,
+                  fontFamily: DesignTokens.fontFamilyPrimary,
+                ),
               ),
-            ),
+              SizedBox(height: 32.h),
+              ElevatedButton(
+                onPressed: () => context.go(isSupermarket ? '/home/supermarches' : '/home/top-marchands'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: DesignTokens.primary950,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 32.w,
+                    vertical: 16.h,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(DesignTokens.radiusMd.r),
+                  ),
+                ),
+                child: Text(
+                  isSupermarket ? 'Explorer les supermarchés' : 'Explorer les restaurants',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeBase.sp,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: DesignTokens.fontFamilyPrimary,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -574,7 +581,7 @@ class CartScreen extends ConsumerWidget {
           'Êtes-vous sûr de vouloir supprimer tous les articles de votre panier ?',
           style: TextStyle(
             fontSize: DesignTokens.fontSizeBase.sp,
-            color: DesignTokens.neutral500,
+            color: DesignTokens.neutral850,
             fontFamily: DesignTokens.fontFamilyPrimary,
           ),
         ),

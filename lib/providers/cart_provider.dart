@@ -18,6 +18,7 @@ class CartState with _$CartState {
     @Default(0.0) double totalPrice,
     @Default(false) bool isLoading,
     String? error,
+    @Default('restaurant') String context, // 'restaurant' or 'supermarket'
   }) = _CartState;
 
   factory CartState.fromJson(Map<String, dynamic> json) => _$CartStateFromJson(json);
@@ -56,12 +57,19 @@ class CartNotifier extends StateNotifier<CartState> {
     }
   }
 
+  /// Set cart context (restaurant or supermarket)
+  void setContext(String context) {
+    state = state.copyWith(context: context);
+    _saveCartToStorage();
+  }
+
   /// Add item to cart with customizations
   void addItem({
     required MenuItem menuItem,
     required Map<String, int> customizations,
     required double basePrice,
     required Map<String, double> customizationPrices,
+    String? context,
   }) {
     final cartItemId = _generateCartItemId(menuItem.id, customizations);
     
@@ -82,6 +90,7 @@ class CartNotifier extends StateNotifier<CartState> {
       state = state.copyWith(
         items: {...state.items, cartItemId: cartItem},
         error: null,
+        context: context ?? state.context,
       );
     }
     

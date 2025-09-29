@@ -141,11 +141,28 @@ class AppRouter {
         name: 'merchant-detail',
         builder: (context, state) {
           final merchantId = state.pathParameters['merchantId']!;
-          final merchant = SampleData.topMerchantsList.firstWhere(
-            (m) => m.id == merchantId,
-            orElse: () => SampleData.topMerchantsList.first,
-          );
-          return MerchantDetailPage(merchant: merchant);
+          
+          // First try to find in top merchants list
+          try {
+            final merchant = SampleData.topMerchantsList.firstWhere(
+              (m) => m.id == merchantId,
+            );
+            return MerchantDetailPage(merchant: merchant);
+          } catch (e) {
+            // If not found, try supermarkets list
+            try {
+              final merchant = SampleData.supermarketsList.firstWhere(
+                (m) => m.id == merchantId,
+              );
+              return MerchantDetailPage(merchant: merchant);
+            } catch (e) {
+              // Fallback to first available merchant
+              final merchant = SampleData.topMerchantsList.isNotEmpty 
+                  ? SampleData.topMerchantsList.first
+                  : SampleData.supermarketsList.first;
+              return MerchantDetailPage(merchant: merchant);
+            }
+          }
         },
       ),
     ],

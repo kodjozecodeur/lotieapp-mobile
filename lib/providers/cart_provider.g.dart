@@ -17,6 +17,7 @@ _$CartStateImpl _$$CartStateImplFromJson(Map<String, dynamic> json) =>
       totalPrice: (json['totalPrice'] as num?)?.toDouble() ?? 0.0,
       isLoading: json['isLoading'] as bool? ?? false,
       error: json['error'] as String?,
+      context: json['context'] as String? ?? 'restaurant',
     );
 
 Map<String, dynamic> _$$CartStateImplToJson(_$CartStateImpl instance) =>
@@ -26,4 +27,5 @@ Map<String, dynamic> _$$CartStateImplToJson(_$CartStateImpl instance) =>
       'totalPrice': instance.totalPrice,
       'isLoading': instance.isLoading,
       'error': instance.error,
+      'context': instance.context,
     };

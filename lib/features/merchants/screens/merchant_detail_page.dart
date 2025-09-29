@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,8 +53,16 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
   /// Current menu items
   List<MenuItem> _menuItems = [];
 
-  /// Selected supplements for each item (for modal display)
-  Map<String, Map<String, int>> _selectedSupplements = {};
+  /// Draggable bottom sheet state
+  double _bottomSheetHeight = 0.6; // 60% of screen initially
+  bool _isTopInfoVisible = true;
+  bool _isDragging = false;
+  double _initialDragHeight = 0.0;
+
+  /// Animation controllers for smooth transitions
+  late AnimationController _topInfoAnimationController;
+  late AnimationController _bottomSheetAnimationController;
+  late Animation<double> _topInfoOpacityAnimation;
 
   @override
   void initState() {
@@ -74,6 +83,16 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
       vsync: this,
     );
 
+    // New animation controllers for draggable bottom sheet
+    _topInfoAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _bottomSheetAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
@@ -82,6 +101,15 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
         Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
           CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
         );
+
+    // Top info animations (only opacity, no sliding)
+    _topInfoOpacityAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _topInfoAnimationController,
+      curve: Curves.easeInOut,
+    ));
 
     // Start animations
     _fadeController.forward();
@@ -98,6 +126,8 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
+    _topInfoAnimationController.dispose();
+    _bottomSheetAnimationController.dispose();
     super.dispose();
   }
 
@@ -105,6 +135,7 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
   Widget build(BuildContext context) {
     final cartState = ref.watch(cartProvider);
     final cartNotifier = ref.read(cartProvider.notifier);
+    final screenHeight = MediaQuery.of(context).size.height;
     
     return Scaffold(
       body: Stack(
@@ -119,11 +150,22 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
           if (cartState.items.isNotEmpty)
             _buildFloatingCartButton(cartState, cartNotifier),
 
-          // Detached top info card
+          // Fixed top info card (only visibility changes)
           _buildDetachedInfoCard(),
 
-          // Bottom sheet only
-          _buildBottomSheet(),
+          // Draggable bottom sheet
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * _bottomSheetHeight,
+            child: GestureDetector(
+              onPanStart: _onDragStart,
+              onPanUpdate: _onDragUpdate,
+              onPanEnd: _onDragEnd,
+              child: _buildDraggableBottomSheet(),
+            ),
+          ),
         ],
       ),
     );
@@ -243,91 +285,31 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
       top: 130.h, // Increased spacing from floating action buttons
       left: DesignTokens.space5.w,
       right: DesignTokens.space5.w,
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(DesignTokens.radiusLg.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+      child: AnimatedBuilder(
+        animation: _topInfoAnimationController,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _topInfoOpacityAnimation.value,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusLg.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: _buildFixedInfoCard(),
             ),
-            child: _buildFixedInfoCard(),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  /// Build bottom sheet only (without top card)
-  Widget _buildBottomSheet() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      height: MediaQuery.of(context).size.height * 0.5, // Fixed 50% height
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(DesignTokens.radius3xl.r),
-            topRight: Radius.circular(DesignTokens.radius3xl.r),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Column(
-              children: [
-                // Drag handle
-                Container(
-                   padding: EdgeInsets.symmetric(
-                     vertical: DesignTokens.space3.h,
-                   ),
-                   child: Center(
-                     child: Container(
-                       width: 40.w,
-                       height: 4.h,
-                       decoration: BoxDecoration(
-                         color: DesignTokens.neutral300,
-                         borderRadius: BorderRadius.circular(2.r),
-                      ),
-                    ),
-                  ),
-                ),
- 
-                // Fixed search section
-                _buildSearchSection(),
- 
-                // Fixed filter chips
-                _buildFilterChips(),
- 
-                // Scrollable menu items list
-                Expanded(
-                  child: _buildMenuList(),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   /// Build fixed info card at top of modal
   Widget _buildFixedInfoCard() {
@@ -385,7 +367,7 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
                   children: [
                     // Merchant name
                     Text(
-                      'Restaurant les 2A', // Using Figma design name
+                      widget.merchant.businessName, // Dynamic merchant name
                       style: TextStyle(
                         fontSize: DesignTokens.fontSize2xl.sp,
                         fontWeight: DesignTokens.fontWeightBold,
@@ -396,7 +378,9 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
 
                     // Status with green color
                     Text(
-                      'Ouvert actuellement',
+                      widget.merchant.merchantType == MerchantType.supermarket 
+                          ? 'Ouvert maintenant' 
+                          : 'Ouvert actuellement',
                       style: TextStyle(
                         fontSize: DesignTokens.fontSizeSm.sp,
                         fontWeight: DesignTokens.fontWeightMedium,
@@ -428,7 +412,7 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
                   Icon(Icons.location_on, size: 16.w, color: Colors.red),
                   SizedBox(width: DesignTokens.space2.w),
                   Text(
-                    'Nukafu, Nukafu',
+                    '${widget.merchant.distance} • ${widget.merchant.duration}',
                     style: TextStyle(
                       fontSize: DesignTokens.fontSizeSm.sp,
                       color: DesignTokens.neutral600,
@@ -567,7 +551,9 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
         child: TextField(
           onChanged: _handleSearchChanged,
           decoration: InputDecoration(
-            hintText: 'Recherche rapide',
+            hintText: widget.merchant.merchantType == MerchantType.supermarket 
+                ? 'Rechercher des produits...' 
+                : 'Recherche rapide',
             hintStyle: TextStyle(
               color: DesignTokens.neutral700,
               fontFamily: DesignTokens.fontFamilyPrimary,
@@ -601,8 +587,11 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
 
   /// Build enhanced filter chips matching Figma design
   Widget _buildFilterChips() {
-    // Use Figma design categories
-    final figmaCategories = ['Tout', 'Noodles', 'Riz', 'Boissons'];
+    // Use different categories based on merchant type
+    final isSupermarket = widget.merchant.merchantType == MerchantType.supermarket;
+    final categories = isSupermarket 
+        ? ['Tout', 'Jouet', 'Electronique', 'Hygiene', 'Divers']
+        : ['Tout', 'Noodles', 'Riz', 'Boissons'];
 
     return Container(
         height: 50.h,
@@ -610,9 +599,9 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
-          itemCount: figmaCategories.length,
+          itemCount: categories.length,
           itemBuilder: (context, index) {
-            final category = figmaCategories[index];
+            final category = categories[index];
             final isSelected = category == _selectedCategory;
 
             return Container(
@@ -680,17 +669,43 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
   /// Build menu items list
   Widget _buildMenuList() {
     final filteredItems = _getFilteredItems();
+    
+    // Check if this is a supermarket to use grid layout
+    final isSupermarket = widget.merchant.merchantType == MerchantType.supermarket;
  
-    return ListView.builder(
-      padding: EdgeInsets.only(
-        bottom: DesignTokens.space8.h,
-      ),
-      itemCount: filteredItems.length,
-      itemBuilder: (context, index) {
-        final item = filteredItems[index];
-        return _buildMenuItem(item);
-      },
-    );
+    if (isSupermarket) {
+      // Grid layout for supermarkets
+      return GridView.builder(
+        padding: EdgeInsets.only(
+          bottom: DesignTokens.space8.h,
+          left: DesignTokens.space4.w,
+          right: DesignTokens.space4.w,
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: DesignTokens.space2.w,
+          mainAxisSpacing: DesignTokens.space2.h,
+        ),
+        itemCount: filteredItems.length,
+        itemBuilder: (context, index) {
+          final item = filteredItems[index];
+          return _buildSupermarketProduct(item);
+        },
+      );
+    } else {
+      // List layout for restaurants
+      return ListView.builder(
+        padding: EdgeInsets.only(
+          bottom: DesignTokens.space8.h,
+        ),
+        itemCount: filteredItems.length,
+        itemBuilder: (context, index) {
+          final item = filteredItems[index];
+          return _buildMenuItem(item);
+        },
+      );
+    }
   }
 
   /// Build individual menu item with Figma design
@@ -799,6 +814,141 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
     );
   }
 
+  /// Build supermarket product card for grid layout
+  Widget _buildSupermarketProduct(MenuItem item) {
+    return GestureDetector(
+      onTap: () => print('[SupermarketProduct] Tapped on ${item.name}'),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusLg.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product image
+            Expanded(
+              flex: 1,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(DesignTokens.radiusLg.r),
+                    topRight: Radius.circular(DesignTokens.radiusLg.r),
+                  ),
+                  color: DesignTokens.neutral100,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(DesignTokens.radiusLg.r),
+                    topRight: Radius.circular(DesignTokens.radiusLg.r),
+                  ),
+                  child: item.imageUrl != null
+                      ? Image.asset(
+                          item.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => _buildDefaultProductIcon(),
+                        )
+                      : _buildDefaultProductIcon(),
+                ),
+              ),
+            ),
+            
+            // Product info
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: EdgeInsets.all(DesignTokens.space2.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Product name
+                    Text(
+                      item.name,
+                      style: TextStyle(
+                        fontSize: DesignTokens.fontSizeXs.sp,
+                        fontWeight: DesignTokens.fontWeightSemiBold,
+                        color: DesignTokens.neutral900,
+                        fontFamily: DesignTokens.fontFamilyPrimary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const Spacer(),
+                    
+                    // Price and add button row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Price
+                        Text(
+                          '${item.price} ${item.currency}',
+                          style: TextStyle(
+                            fontSize: DesignTokens.fontSizeXs.sp,
+                            fontWeight: DesignTokens.fontWeightBold,
+                            color: DesignTokens.primary500,
+                            fontFamily: DesignTokens.fontFamilyPrimary,
+                          ),
+                        ),
+                        
+                        // Add button
+                        GestureDetector(
+                          onTap: () => _handleAddSupermarketItem(item),
+                          child: Container(
+                            width: 24.w,
+                            height: 24.w,
+                            decoration: BoxDecoration(
+                              color: DesignTokens.primary500,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 14.w,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Get category color for badges
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Jouet':
+        return DesignTokens.warning500;
+      case 'Electronique':
+        return DesignTokens.info500;
+      case 'Hygiene':
+        return DesignTokens.success500;
+      case 'Divers':
+        return DesignTokens.neutral600;
+      default:
+        return DesignTokens.primary500;
+    }
+  }
+
+  /// Build default product icon
+  Widget _buildDefaultProductIcon() {
+    return Icon(Icons.shopping_bag, size: 40.w, color: DesignTokens.primary500);
+  }
+
   /// Build default food icon
   Widget _buildDefaultFoodIcon() {
     return Icon(Icons.restaurant, size: 40.w, color: DesignTokens.primary500);
@@ -874,6 +1024,168 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
     debugPrint('[MerchantDetailPage] Opening item detail modal for: ${item.name}');
   }
 
+  /// Handle direct add to cart for supermarket items (no modal)
+  void _handleAddSupermarketItem(MenuItem item) {
+    final cartNotifier = ref.read(cartProvider.notifier);
+    
+    // Add item directly to cart without customization modal
+    cartNotifier.addItem(
+      menuItem: item,
+      customizations: {}, // No customizations for supermarket items
+      basePrice: item.price,
+      customizationPrices: {}, // No customization prices
+      context: 'supermarket', // Set context to supermarket
+    );
+
+    // Show success feedback
+    _showCartSnackbar();
+    
+    // Add haptic feedback
+    HapticFeedback.lightImpact();
+    
+    debugPrint('[MerchantDetailPage] Added supermarket item to cart: ${item.name}');
+  }
+
+  /// Handle drag start for bottom sheet
+  void _onDragStart(DragStartDetails details) {
+    _isDragging = true;
+    _initialDragHeight = _bottomSheetHeight;
+    print('[MerchantDetailPage] Drag started, initial height: $_initialDragHeight');
+  }
+
+  /// Handle drag update for bottom sheet
+  void _onDragUpdate(DragUpdateDetails details) {
+    if (!_isDragging) return;
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    final deltaY = -details.delta.dy / screenHeight; // Negative because we're dragging up
+    final newHeight = (_bottomSheetHeight + deltaY).clamp(0.3, 1.0);
+    
+    setState(() {
+      _bottomSheetHeight = newHeight;
+      
+      // Hide top info when sheet is > 70% of screen (earlier for better UX)
+      final shouldHideTopInfo = _bottomSheetHeight > 0.7;
+      if (shouldHideTopInfo != !_isTopInfoVisible) {
+        _isTopInfoVisible = !shouldHideTopInfo;
+        if (shouldHideTopInfo) {
+          _topInfoAnimationController.forward();
+        } else {
+          _topInfoAnimationController.reverse();
+        }
+      }
+    });
+  }
+
+  /// Handle drag end for bottom sheet with snap behavior
+  void _onDragEnd(DragEndDetails details) {
+    if (!_isDragging) return;
+    
+    _isDragging = false;
+    print('[MerchantDetailPage] Drag ended, final height: $_bottomSheetHeight');
+    
+    // Snap to nearest position
+    double targetHeight;
+    if (_bottomSheetHeight > 0.65) {
+      targetHeight = 1.0; // Full screen
+      _isTopInfoVisible = false;
+      _topInfoAnimationController.forward();
+    } else if (_bottomSheetHeight > 0.45) {
+      targetHeight = 0.6; // Default
+      _isTopInfoVisible = true;
+      _topInfoAnimationController.reverse();
+    } else {
+      targetHeight = 0.3; // Minimal
+      _isTopInfoVisible = true;
+      _topInfoAnimationController.reverse();
+    }
+    
+    // Animate to target height
+    _animateToHeight(targetHeight);
+  }
+
+  /// Animate bottom sheet to target height
+  void _animateToHeight(double targetHeight) {
+    _bottomSheetAnimationController.reset();
+    _bottomSheetAnimationController.forward().then((_) {
+      setState(() {
+        _bottomSheetHeight = targetHeight;
+      });
+    });
+  }
+
+  /// Build draggable bottom sheet with drag handle
+  Widget _buildDraggableBottomSheet() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(DesignTokens.radiusXl.r),
+          topRight: Radius.circular(DesignTokens.radiusXl.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Drag handle
+          _buildDragHandle(),
+          
+          // Bottom sheet content
+          Expanded(
+            child: _buildBottomSheetContent(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build drag handle for bottom sheet
+  Widget _buildDragHandle() {
+    return Container(
+      margin: EdgeInsets.only(top: DesignTokens.space3.h),
+      width: 40.w,
+      height: 4.h,
+      decoration: BoxDecoration(
+        color: DesignTokens.neutral300,
+        borderRadius: BorderRadius.circular(2.r),
+      ),
+    );
+  }
+
+  /// Build bottom sheet content (menu/products)
+  Widget _buildBottomSheetContent() {
+    return Column(
+      children: [
+        // Search and filter section
+        _buildSearchAndFilterSection(),
+        
+        // Menu/products list
+        Expanded(
+          child: _buildMenuList(),
+        ),
+      ],
+    );
+  }
+
+  /// Build combined search and filter section
+  Widget _buildSearchAndFilterSection() {
+    return Column(
+      children: [
+        // Search section
+        _buildSearchSection(),
+        
+        // Filter chips
+        _buildFilterChips(),
+      ],
+    );
+  }
+
   /// Handle add to cart with supplements
   void _handleAddToCartWithSupplements(MenuItem item, Map<String, int> supplements, CartNotifier cartNotifier) {
     // Create customization prices map (simplified for now)
@@ -887,6 +1199,7 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
       customizations: supplements,
       basePrice: item.price,
       customizationPrices: customizationPrices,
+      context: 'restaurant', // Set context to restaurant
     );
 
     debugPrint(

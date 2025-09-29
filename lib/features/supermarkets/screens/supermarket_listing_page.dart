@@ -108,7 +108,7 @@ class _SupermarketListingPageState extends ConsumerState<SupermarketListingPage>
       body: Column(
         children: [
           _buildSearchSection(),
-          _buildFilterSection(),
+          // _buildFilterSection(),
           Expanded(
             child: _buildSupermarketsList(),
           ),
