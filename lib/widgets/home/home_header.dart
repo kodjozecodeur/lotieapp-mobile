@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/design_tokens.dart';
+import '../../providers/cart_provider.dart';
+import '../../features/cart/screens/cart_screen.dart';
 
 /// Home header component
 ///
@@ -12,7 +15,7 @@ import '../../core/constants/design_tokens.dart';
 /// - Notification bell icon with red dot indicator
 ///
 /// All styling uses DesignTokens for consistency.
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends ConsumerWidget {
   const HomeHeader({
     super.key,
     this.userName = 'Donald',
@@ -46,7 +49,8 @@ class HomeHeader extends StatelessWidget {
   final VoidCallback? onNotificationsTapped;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartState = ref.watch(cartProvider);
     return Row(
       children: [
         // Left side - Greeting and location
@@ -155,6 +159,11 @@ class HomeHeader extends StatelessWidget {
 
             SizedBox(width: DesignTokens.space4.w),
 
+            // Cart icon with item count
+            _buildCartIcon(context, cartState),
+
+            SizedBox(width: DesignTokens.space4.w),
+
             // Notification bell with indicator
             GestureDetector(
               onTap: onNotificationsTapped,
@@ -199,6 +208,65 @@ class HomeHeader extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  /// Build cart icon with item count badge
+  Widget _buildCartIcon(BuildContext context, cartState) {
+    return GestureDetector(
+      onTap: () => _handleCartTap(context),
+      child: SizedBox(
+        width: 24.w,
+        height: 24.h,
+        child: Stack(
+          children: [
+            // Cart icon
+            Icon(
+              Icons.shopping_cart_outlined,
+              size: 24.w,
+              color: DesignTokens.neutral900,
+            ),
+
+            // Cart item count badge
+            if (cartState.totalItems > 0)
+              Positioned(
+                top: 0.h,
+                right: 0.w,
+                child: Container(
+                  padding: EdgeInsets.all(2.w),
+                  decoration: const BoxDecoration(
+                    color: DesignTokens.error500,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16.w,
+                    minHeight: 16.w,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${cartState.totalItems}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: DesignTokens.fontWeightBold,
+                        fontFamily: DesignTokens.fontFamilyPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Handle cart icon tap
+  void _handleCartTap(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const CartScreen(),
+      ),
     );
   }
 }

@@ -67,16 +67,11 @@ class CartScreen extends ConsumerWidget {
 
   /// Build empty cart state
   Widget _buildEmptyState(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final cartState = ref.watch(cartProvider);
-        final isSupermarket = cartState.context == 'supermarket';
-        
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
                 'assets/icons/empty_cart.svg',
                 width: 100.w,
                 height: 100.h,
@@ -106,7 +101,7 @@ class CartScreen extends ConsumerWidget {
               ),
               SizedBox(height: 32.h),
               ElevatedButton(
-                onPressed: () => context.go(isSupermarket ? '/home/supermarches' : '/home/top-marchands'),
+                onPressed: () => context.go('/home'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: DesignTokens.primary950,
                   foregroundColor: Colors.white,
@@ -119,7 +114,7 @@ class CartScreen extends ConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  isSupermarket ? 'Explorer les supermarchés' : 'Explorer les restaurants',
+                  'Retour à l\'accueil',
                   style: TextStyle(
                     fontSize: DesignTokens.fontSizeBase.sp,
                     color: Colors.white,
@@ -128,10 +123,8 @@ class CartScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-            ],
-          ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -616,4 +609,5 @@ class CartScreen extends ConsumerWidget {
       ),
     );
   }
+
 }

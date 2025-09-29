@@ -10,6 +10,7 @@ import '../../../models/menu_item.dart';
 import '../../../data/sample_data.dart';
 import '../../../providers/cart_provider.dart';
 import 'item_detail_modal.dart';
+import 'electronics_products_page.dart';
 import '../../../widgets/cart_snackbar.dart';
 import '../../cart/screens/cart_screen.dart';
 
@@ -54,7 +55,7 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
   List<MenuItem> _menuItems = [];
 
   /// Draggable bottom sheet state
-  double _bottomSheetHeight = 0.6; // 60% of screen initially
+  double _bottomSheetHeight = 0.5; // 50% of screen initially
   bool _isTopInfoVisible = true;
   bool _isDragging = false;
   double _initialDragHeight = 0.0;
@@ -1046,6 +1047,54 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
     debugPrint('[MerchantDetailPage] Added supermarket item to cart: ${item.name}');
   }
 
+  /// Handle add product to cart from product card
+  void _handleAddProductToCart() {
+    final cartNotifier = ref.read(cartProvider.notifier);
+    
+    // Create a sample product (you can customize this based on your needs)
+    final product = MenuItem(
+      id: 'ps5_controller_${DateTime.now().millisecondsSinceEpoch}',
+      name: 'Playstation 5 DualSense',
+      description: 'Wireless controller for PlayStation 5',
+      price: 5000.0,
+      currency: 'FCFA',
+      imageUrl: 'assets/images/ps5.png',
+      category: 'Électroniques',
+      isAvailable: true,
+      preparationTime: 0, // Instant for products
+    );
+    
+    // Add product directly to cart
+    cartNotifier.addItem(
+      menuItem: product,
+      customizations: {}, // No customizations for products
+      basePrice: product.price,
+      customizationPrices: {}, // No customization prices
+      context: 'supermarket', // Set context to supermarket
+    );
+
+    // Show success feedback
+    _showCartSnackbar();
+    
+    // Add haptic feedback
+    HapticFeedback.lightImpact();
+    
+    debugPrint('[MerchantDetailPage] Added product to cart: ${product.name}');
+  }
+
+  /// Navigate to electronics products page
+  void _navigateToElectronicsPage() {
+    print('[MerchantDetailPage] Navigating to electronics products page');
+    
+    // Navigate to electronics products page
+    // You can replace this with your actual route
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ElectronicsProductsPage(),
+      ),
+    );
+  }
+
   /// Handle drag start for bottom sheet
   void _onDragStart(DragStartDetails details) {
     _isDragging = true;
@@ -1086,12 +1135,12 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
     
     // Snap to nearest position
     double targetHeight;
-    if (_bottomSheetHeight > 0.65) {
+    if (_bottomSheetHeight > 0.75) {
       targetHeight = 1.0; // Full screen
       _isTopInfoVisible = false;
       _topInfoAnimationController.forward();
-    } else if (_bottomSheetHeight > 0.45) {
-      targetHeight = 0.6; // Default
+    } else if (_bottomSheetHeight > 0.4) {
+      targetHeight = 0.5; // 50% - Default
       _isTopInfoVisible = true;
       _topInfoAnimationController.reverse();
     } else {
@@ -1162,14 +1211,278 @@ class _MerchantDetailPageState extends ConsumerState<MerchantDetailPage>
   Widget _buildBottomSheetContent() {
     return Column(
       children: [
-        // Search and filter section
-        _buildSearchAndFilterSection(),
+        // Search section only
+        _buildSearchSection(),
         
-        // Menu/products list
+        // Scrollable content
         Expanded(
-          child: _buildMenuList(),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Category Grid
+                _buildCategoryGrid(),
+                
+                
+                
+                // Electronics Section
+                _buildElectronicsSection(),
+                
+                // SizedBox(height: DesignTokens.space6.h),
+                
+                // Category Grid (appears twice)
+               
+              ],
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  /// Build category grid with 3 columns
+  Widget _buildCategoryGrid() {
+    final categories = [
+      {'icon': 'assets/images/jouet.png', 'label': 'Jouets'}, // You can change this to a toy icon
+      {'icon': 'assets/images/electronics.png', 'label': 'Électroniques'}, // You can change this to an electronics icon
+      {'icon': 'assets/images/hygiene.png', 'label': 'Hygiène'}, // You can change this to a hygiene icon
+    ];
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: DesignTokens.space5.w,
+        vertical: DesignTokens.space0.h,
+      ),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 1.2,
+          crossAxisSpacing: DesignTokens.space4.w,
+          mainAxisSpacing: DesignTokens.space4.h,
+        ),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return _buildCategoryCard(category['icon']!, category['label']!);
+        },
+      ),
+    );
+  }
+
+  /// Build individual category card
+  Widget _buildCategoryCard(String iconPath, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        color: DesignTokens.neutral100,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusLg.r),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Category icon
+           Center(
+              child: Image.asset(
+                iconPath,
+                width: 35.w,
+                height: 35.h,
+                fit: BoxFit.contain,
+              ),
+            ),
+          
+          
+          SizedBox(height: DesignTokens.space2.h),
+          
+          // Category label
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: DesignTokens.fontSizeSm.sp,
+              fontWeight: DesignTokens.fontWeightMedium,
+              color: DesignTokens.neutral700,
+              fontFamily: DesignTokens.fontFamilyPrimary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build electronics section with horizontal scrollable products
+  Widget _buildElectronicsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
+          child: GestureDetector(
+            onTap: () => _navigateToElectronicsPage(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Électroniques',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeLg.sp,
+                    fontWeight: DesignTokens.fontWeightSemiBold,
+                    color: DesignTokens.neutral900,
+                    fontFamily: DesignTokens.fontFamilyPrimary,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16.w,
+                  color: DesignTokens.neutral600,
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        SizedBox(height: DesignTokens.space2.h),
+        
+        // Horizontal scrollable product list
+        Container(
+          height: 200.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: DesignTokens.space5.w),
+            itemCount: 4, // Show 2 products
+            itemBuilder: (context, index) {
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.4, // 40% of screen width
+                margin: EdgeInsets.only(right: DesignTokens.space4.w),
+                child: _buildProductCard(),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build individual product card
+  Widget _buildProductCard() {
+    return Container(
+      height: 200.h,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusLg.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Product image with add button
+          Expanded(
+            flex: 9,
+            child: Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.neutral100,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(DesignTokens.radiusLg.r),
+                      topRight: Radius.circular(DesignTokens.radiusLg.r),
+                    ),
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/ps5.png',
+                      width: 100.w,
+                      height: 100.h,
+                      fit: BoxFit.contain,
+                    )
+                  ),
+                ),
+                // Add button
+                Positioned(
+                  bottom: DesignTokens.space1.h,
+                  right: DesignTokens.space1.w,
+                  child: GestureDetector(
+                    onTap: () => _handleAddProductToCart(),
+                    child: Container(
+                      width: 24.w,
+                      height: 24.w,
+                      decoration: BoxDecoration(
+                        color: DesignTokens.success500,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 16.w,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Product details
+          Expanded(
+            flex: 7,
+            child: Padding(
+              padding: EdgeInsets.all(DesignTokens.space2.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Price
+                  Text(
+                    '5 000 FCFA',
+                    style: TextStyle(
+                      fontSize: DesignTokens.fontSizeSm.sp,
+                      fontWeight: DesignTokens.fontWeightBold,
+                      color: DesignTokens.neutral900,
+                      fontFamily: DesignTokens.fontFamilyPrimary,
+                    ),
+                  ),
+                  
+                  // Product name
+                  Text(
+                    'Playstation 5 DualSense',
+                    style: TextStyle(
+                      fontSize: DesignTokens.fontSizeXs.sp,
+                      fontWeight: DesignTokens.fontWeightMedium,
+                      color: DesignTokens.neutral700,
+                      fontFamily: DesignTokens.fontFamilyPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  
+                  // Rating
+                  Row(
+                    children: [
+                      Text(
+                        '4.4',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: DesignTokens.fontWeightMedium,
+                          color: DesignTokens.neutral600,
+                          fontFamily: DesignTokens.fontFamilyPrimary,
+                        ),
+                      ),
+                      SizedBox(width: DesignTokens.space1.w),
+                      ...List.generate(5, (index) => Icon(
+                        Icons.star,
+                        size: 10.w,
+                        color: Colors.amber,
+                      )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

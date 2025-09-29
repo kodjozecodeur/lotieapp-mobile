@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotieapp/routes/app_router.dart';
 import '../../../core/constants/design_tokens.dart';
 import '../../../widgets/home/search_bar_widget.dart';
 import '../../../widgets/marchands/top_merchant_card.dart';
+import '../../../widgets/global_floating_cart_button.dart';
 import '../../../models/top_merchant.dart';
 import '../../../data/sample_data.dart';
 
@@ -18,14 +20,14 @@ import '../../../data/sample_data.dart';
 /// - Consistent styling following Apple HIG
 /// 
 /// Uses modular components with DesignTokens for styling.
-class TopMarchandsPage extends StatefulWidget {
+class TopMarchandsPage extends ConsumerStatefulWidget {
   const TopMarchandsPage({super.key});
 
   @override
-  State<TopMarchandsPage> createState() => _TopMarchandsPageState();
+  ConsumerState<TopMarchandsPage> createState() => _TopMarchandsPageState();
 }
 
-class _TopMarchandsPageState extends State<TopMarchandsPage>
+class _TopMarchandsPageState extends ConsumerState<TopMarchandsPage>
     with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -90,7 +92,9 @@ class _TopMarchandsPageState extends State<TopMarchandsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DesignTokens.neutral50,
-      body: CustomScrollView(
+      body: Stack(
+        children: [
+          CustomScrollView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -107,6 +111,11 @@ class _TopMarchandsPageState extends State<TopMarchandsPage>
                       MediaQuery.of(context).padding.bottom,
             ),
           ),
+        ],
+      ),
+          
+          // Global floating cart button
+          const GlobalFloatingCartButton(),
         ],
       ),
     );

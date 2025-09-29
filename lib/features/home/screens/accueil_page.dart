@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/design_tokens.dart';
 import '../../../widgets/home/home_header.dart';
 import '../../../widgets/home/search_bar_widget.dart';
 import '../../../widgets/home/category_grid.dart';
 import '../../../widgets/home/section_header.dart';
 import '../../../widgets/home/horizontal_product_list.dart';
+import '../../../widgets/global_floating_cart_button.dart';
 import '../../../data/sample_data.dart';
 import '../../../routes/app_router.dart';
 
@@ -21,14 +23,14 @@ import '../../../routes/app_router.dart';
 /// - Recommended products section
 /// 
 /// Uses modular components with DesignTokens for styling.
-class AccueilPage extends StatefulWidget {
+class AccueilPage extends ConsumerStatefulWidget {
   const AccueilPage({super.key});
 
   @override
-  State<AccueilPage> createState() => _AccueilPageState();
+  ConsumerState<AccueilPage> createState() => _AccueilPageState();
 }
 
-class _AccueilPageState extends State<AccueilPage> {
+class _AccueilPageState extends ConsumerState<AccueilPage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -41,7 +43,9 @@ class _AccueilPageState extends State<AccueilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DesignTokens.neutral50,
-      body: CustomScrollView(
+      body: Stack(
+        children: [
+          CustomScrollView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -222,6 +226,11 @@ class _AccueilPageState extends State<AccueilPage> {
                       MediaQuery.of(context).padding.bottom,
             ),
           ),
+        ],
+      ),
+          
+          // Global floating cart button
+          const GlobalFloatingCartButton(),
         ],
       ),
     );
