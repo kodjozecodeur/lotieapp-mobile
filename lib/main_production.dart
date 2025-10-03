@@ -7,29 +7,33 @@ import 'core/config/app_config.dart';
 import 'core/di/service_locator.dart';
 import 'core/utils/logger.dart';
 
-/// Application entry point
+/// Production Environment Entry Point
 /// 
-/// This is the main entry point for the Lotie app.
-/// It initializes the app with proper dependency injection,
-/// logging, and clean architecture structure.
+/// This is the main entry point for the Lotie app in production environment.
+/// It initializes the app with production-specific configuration including:
+/// - Production API endpoints
+/// - Optimized logging for performance
+/// - Production app identifiers for app store
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set staging flavor by default (for development)
-  FlavorConfig.instance.setFlavor(Flavor.staging);
+  // Set production flavor
+  FlavorConfig.instance.setFlavor(Flavor.production);
 
-  // Initialize logger
+  // Initialize logger with production configuration
   logger.initialize();
-  logger.info('[Main] Starting Lotie App in STAGING environment (default)...');
+  logger.info('[MainProduction] Starting Lotie App in PRODUCTION environment...');
 
   try {
-    // Print configuration for debugging
-    AppConfig.printConfig();
+    // Print configuration for debugging (minimal in production)
+    if (AppConfig.isDebugMode) {
+      AppConfig.printConfig();
+    }
 
     // Setup dependency injection
     await setupServiceLocator();
-    logger.info('[Main] Service locator initialized successfully');
+    logger.info('[MainProduction] Service locator initialized successfully');
 
     // Set preferred orientations (optional)
     await SystemChrome.setPreferredOrientations([
@@ -43,13 +47,14 @@ void main() async {
         child: const App(),
       ),
     );
-    logger.info('[Main] App started successfully');
+    logger.info('[MainProduction] Production app started successfully');
   } catch (error, stackTrace) {
-    logger.fatal('[Main] Failed to start app', error, stackTrace);
+    logger.fatal('[MainProduction] Failed to start production app', error, stackTrace);
     
     // Run a fallback app in case of initialization failure
     runApp(
       MaterialApp(
+        title: 'LotieApp - Error',
         home: Scaffold(
           body: Center(
             child: Column(
@@ -62,10 +67,19 @@ void main() async {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  error.toString(),
+                const Text(
+                  'Please restart the app or contact support',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.grey),
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Environment: PRODUCTION',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.green,
+                  ),
                 ),
               ],
             ),
